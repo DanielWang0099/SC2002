@@ -16,10 +16,10 @@ The Build-To-Order Management System (BTOMS) is a Java-based command line interf
 
 | **Name**           | **GitHub Profile**                                  | **Email Address**        |
 |--------------------|-----------------------------------------------------|--------------------------|
-| Gerald Koh         | <img alt="Static Badge" src="https://img.shields.io/badge/callmegerlad-181717?logo=github&link=https%3A%2F%2Fgithub.com%2Fcallmegerlad"> | GKOH015@e.ntu.edu.sg     |
-| Daniel Wang        | <img alt="Static Badge" src="https://img.shields.io/badge/DanielWang0099-181717?logo=github&link=https%3A%2F%2Fgithub.com%2FDanielWang0099"> | WA0001EL@e.ntu.edu.sg    |
-| Lin Xin            |                                                     | XLIN030@e.ntu.edu.sg     |
-| Shuen Hwee         |                                                     | SIMS0047@e.ntu.edu.sg    |
+| Gerald Koh         | [![GitHub Badge](https://img.shields.io/badge/callmegerlad-%23181717?logo=github)](https://github.com/callmegerlad) | GKOH015@e.ntu.edu.sg     |
+| Daniel Wang        | [![GitHub Badge](https://img.shields.io/badge/DanielWang0099-%23181717?logo=github)](https://github.com/DanielWang0099) | WA0001EL@e.ntu.edu.sg    |
+| Lin Xin            | [![GitHub Badge](https://img.shields.io/badge/delelin-%23181717?logo=github)](https://github.com/delelin) | XLIN030@e.ntu.edu.sg     |
+| Shuen Hwee         | [![GitHub Badge](https://img.shields.io/badge/shenxh24-%23181717?logo=github)](https://github.com/shenxh24) | SIMS0047@e.ntu.edu.sg    |
 | Tripathi Eishani   |                                                     |                          |
 
 
