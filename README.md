@@ -55,25 +55,33 @@ The Build-To-Order Management System (BTOMS) is a Java-based command line interf
 
 ## Getting Started
 
-### 1. Clone the Repository:
+### 1. Clone the Repository
 
+Clone this repository and navigate into the project folder:
 ```shell
 git clone https://github.com/DanielWang0099/SC2002.git
 cd SC2002
 ```
 
-### 2. Compile all the Java source files:
+### 2. Compile all the Java source files
 
-Compiles all Java source files in `src` and stores them in the directory, `bin`.
+Compiles all Java source files in `src` and stores them in the directory, `bin`:
 ```shell
-javac -d ./bin ./src/*.java
+javac -d ./bin ./src/**/*.java
 ```
 
-### 3. Run the application:
+### 3. Run the application
 
-Our main class: `src/Main.java`.
+Execute the main class: `src/Main.java`.
 ```shell
 java -cp ./bin Main
+```
+
+### Alternatively: Compile & Run in One Step
+
+Combining steps 2 and 3, we can compile and run the compiled application with just one command:
+```shell
+javac -d ./bin ./src/**/*.java && java -cp ./bin Main
 ```
 
 
