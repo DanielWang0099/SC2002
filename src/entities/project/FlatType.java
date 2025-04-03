@@ -1,4 +1,4 @@
-package project;
+package entities.project;
 
 /**
  * This enum represents the different types of flats.

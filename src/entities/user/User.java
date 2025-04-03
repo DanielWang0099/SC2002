@@ -1,4 +1,4 @@
-package user;
+package entities.user;
 
 abstract class User {
     private String name;
@@ -10,11 +10,11 @@ abstract class User {
 
     /**
      * Constructs a User object.
-     * @param name          the name of the user
-     * @param nric          the NRIC of the user
-     * @param age           the age of the user
-     * @param maritalStatus the marital status of the user, SINGLE or MARRIED
-     * @param password      the password of the user
+     * @param name          the name of the entities.user
+     * @param nric          the NRIC of the entities.user
+     * @param age           the age of the entities.user
+     * @param maritalStatus the marital status of the entities.user, SINGLE or MARRIED
+     * @param password      the password of the entities.user
      */
     public User(String name, String nric, Integer age, MaritalStatus maritalStatus, String password) {
         this.name = name;
@@ -35,7 +35,7 @@ abstract class User {
     // Getter Methods
 
     /**
-     * Returns the name of the user.
+     * Returns the name of the entities.user.
      * @return name
      */
     public String getName() {
@@ -43,7 +43,7 @@ abstract class User {
     }
 
     /**
-     * Returns the nric of the user.
+     * Returns the nric of the entities.user.
      * @return nric
      */
     public String getNric() {
@@ -51,7 +51,7 @@ abstract class User {
     }
 
     /**
-     * Returns the age of the user.
+     * Returns the age of the entities.user.
      * @return age
      */
     public int getAge() {
@@ -59,7 +59,7 @@ abstract class User {
     }
 
     /**
-     * Returns the marital status of the user.
+     * Returns the marital status of the entities.user.
      * @return marital status
      */
     public MaritalStatus getMaritalStatus() {
@@ -67,7 +67,7 @@ abstract class User {
     }
 
     /**
-     * Returns the password of the user.
+     * Returns the password of the entities.user.
      * @return password
      */
     public String getPassword() {
@@ -78,7 +78,7 @@ abstract class User {
     // Setter Methods
 
     /**
-     * Updates the name of the user.
+     * Updates the name of the entities.user.
      * @param name
      */
     public void setName(String name) {
@@ -86,7 +86,7 @@ abstract class User {
     }
 
     /**
-     * Updates the nric of the user.
+     * Updates the nric of the entities.user.
      * @param nric
      */
     public void setNric(String nric) {
@@ -94,7 +94,7 @@ abstract class User {
     }
 
     /**
-     * Updates the age of the user.
+     * Updates the age of the entities.user.
      * @param age
      */
     public void setAge(int age) {
@@ -102,7 +102,7 @@ abstract class User {
     }
 
     /**
-     * Updates the marital status of the user.
+     * Updates the marital status of the entities.user.
      * @param maritalStatus
      */
     public void setMaritalStatus(MaritalStatus maritalStatus) {
@@ -110,7 +110,7 @@ abstract class User {
     }
 
     /**
-     * Updates the password of the user.
+     * Updates the password of the entities.user.
      * @param password
      */
     public void setPassword(String password) {
@@ -121,7 +121,7 @@ abstract class User {
     // Other Methods
 
     /**
-     * To login and authenticate the user.
+     * To login and authenticate the entities.user.
      */
     public void login() {};
 

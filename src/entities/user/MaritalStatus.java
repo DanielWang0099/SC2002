@@ -1,7 +1,7 @@
-package user;
+package entities.user;
 
 /**
- * This enum represents the marital status of a user.
+ * This enum represents the marital status of a entities.user.
  */
 public enum MaritalStatus {
     /** User is single */
