@@ -1,6 +1,7 @@
-package entities.documents;
+package entities.documents.approvableDocuments;
 
 import entities.user.User;
+import entities.documents.IBaseSubmittableDocument;
 
 public interface IApprovableDocument extends IBaseSubmittableDocument {
 

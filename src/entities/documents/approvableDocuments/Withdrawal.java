@@ -4,6 +4,8 @@ import entities.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import entities.documents.DocumentStatus;
+import entities.documents.DocumentType;
+
 
 public class Withdrawal implements IApprovableDocument {
 
@@ -15,6 +17,7 @@ public class Withdrawal implements IApprovableDocument {
     private LocalDateTime lastModifiedDate;
     private User lastModifiedBy;
     private String rejectionReason; // Reason withdrawal rejected
+    private DocumentType documentType;
 
 
      public Withdrawal(User applicant, ProjectApplication applicationToWithdraw) {
@@ -28,6 +31,7 @@ public class Withdrawal implements IApprovableDocument {
         this.submissionDate = null;
         this.lastModifiedDate = LocalDateTime.now();
         this.lastModifiedBy = applicant;
+        this.documentType = DocumentType.APPLICATION;
          System.out.println("Created Draft Withdrawal Request: " + documentID + " for Application " + applicationToWithdraw.getDocumentID());
     }
 
@@ -35,6 +39,9 @@ public class Withdrawal implements IApprovableDocument {
 
     @Override
     public String getDocumentID() { return documentID; }
+
+    @Override
+    public DocumentType getDocumentType() { return documentType; }
 
     @Override
     public User getSubmitter() { return applicant; }

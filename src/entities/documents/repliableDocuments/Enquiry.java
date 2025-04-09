@@ -1,8 +1,10 @@
-package entities.documents;
+package entities.documents.repliableDocuments;
 
+import entities.documents.DocumentStatus;
 import entities.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import entities.documents.DocumentType;
 
 public class Enquiry implements IReplyableDocument {
 
@@ -17,6 +19,7 @@ public class Enquiry implements IReplyableDocument {
     private LocalDateTime lastModifiedDate;
     private User lastModifiedBy;
     private LocalDateTime replyDate;
+    private DocumentType documentType;
 
 
      public Enquiry(User submitter, /*Project project,*/ String enquiryContent) {
@@ -28,6 +31,7 @@ public class Enquiry implements IReplyableDocument {
         this.submissionDate = null;
         this.lastModifiedDate = LocalDateTime.now();
         this.lastModifiedBy = submitter;
+        this.documentType = DocumentType.APPLICATION;
          System.out.println("Created Draft Enquiry: " + documentID);
     }
 
@@ -35,6 +39,9 @@ public class Enquiry implements IReplyableDocument {
     // --- Interface Methods Implementation (Stubs - adapt for reply logic) ---
     @Override
     public String getDocumentID() { return documentID; }
+
+    @Override
+    public DocumentType getDocumentType() { return documentType; }
 
     @Override
     public User getSubmitter() { return submitter; }

@@ -1,5 +1,6 @@
-package entities.documents;
+package entities.documents.repliableDocuments;
 
+import entities.documents.IBaseSubmittableDocument;
 import entities.user.User;
 
 public interface IReplyableDocument extends IBaseSubmittableDocument {

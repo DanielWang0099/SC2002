@@ -1,6 +1,6 @@
 package controller;
 
-import entities.Database;
+import entities.database.Database;
 
 public class MainController {
     private final UserAuthenticationController authController;

@@ -1,6 +1,6 @@
 package entities.user;
 
-public class HDBOfficer extends Applicant {
+public class HdbOfficer extends Applicant {
     /**
      * Constructs a HDBOfficer object.
      * @param name          the name of the user
@@ -10,14 +10,14 @@ public class HDBOfficer extends Applicant {
      * @param password      the password of the user
      * @param role
      */
-    public HDBOfficer(String name, String nric, int age, MaritalStatus maritalStatus, String password, Role role) {
+    public HdbOfficer(String name, String nric, int age, MaritalStatus maritalStatus, String password, Role role) {
         super(name, nric, age, maritalStatus, password, role);
     }
 
     /**
      * Default constructor for HDBOfficer class.
      */
-    public HDBOfficer() {
+    public HdbOfficer() {
         this(null, null, 0, MaritalStatus.SINGLE, null, null);
     }
 }

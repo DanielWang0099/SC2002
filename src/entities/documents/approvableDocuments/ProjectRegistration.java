@@ -1,8 +1,10 @@
-package entities.documents;
+package entities.documents.approvableDocuments;
 
 import entities.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import entities.documents.DocumentStatus;
+import entities.documents.DocumentType;
 
 
 public class ProjectRegistration implements IApprovableDocument {
@@ -15,6 +17,7 @@ public class ProjectRegistration implements IApprovableDocument {
     private LocalDateTime lastModifiedDate;
     private User lastModifiedBy;
     private String rejectionReason;
+    private DocumentType documentType;
 
      public ProjectRegistration(User officer /*, Project project*/) {
         this.documentID = "REG-" + UUID.randomUUID().toString().substring(0, 8);
@@ -24,6 +27,7 @@ public class ProjectRegistration implements IApprovableDocument {
         this.submissionDate = null;
         this.lastModifiedDate = LocalDateTime.now();
         this.lastModifiedBy = officer;
+        this.documentType = DocumentType.APPLICATION;
          System.out.println("Created Draft Project Registration: " + documentID);
     }
 
@@ -32,6 +36,9 @@ public class ProjectRegistration implements IApprovableDocument {
     @Override
     public String getDocumentID() { return documentID; }
 
+    @Override
+    public DocumentType getDocumentType() { return documentType; }
+    
     @Override
     public User getSubmitter() { return officer; }
 

@@ -1,13 +1,13 @@
 package controller;
 
-import entities.Database;
+import entities.database.Database;
 import entities.user.User;
 import java.util.Optional;
 
 public class UserAuthenticationController {
 
     public Optional<User> login(String nric, String password) {
-        Optional<User> userOpt = Database.findUserByNric(nric);
+        Optional<User> userOpt = Database.getUsersRepository().findUserByNric(nric);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();

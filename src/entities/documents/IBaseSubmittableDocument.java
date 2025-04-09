@@ -10,6 +10,9 @@ public interface IBaseSubmittableDocument {
      */
     String getDocumentID();
 
+
+    DocumentType getDocumentType();
+    
     /**
      * Gets the user who submitted this document.
      * @return The submitting User object.
