@@ -1,11 +1,14 @@
 package entities.user;
 
-abstract class User {
+import java.util.Objects;
+
+public class User {
     private String name;
     private String nric;
     private int age;
     private MaritalStatus maritalStatus;
     private String password;
+    private Role role;
 
 
     /**
@@ -15,106 +18,35 @@ abstract class User {
      * @param age           the age of the user
      * @param maritalStatus the marital status of the user, SINGLE or MARRIED
      * @param password      the password of the user
+     * @param role
      */
-    public User(String name, String nric, Integer age, MaritalStatus maritalStatus, String password) {
+    public User(String name, String nric, Integer age, MaritalStatus maritalStatus, String password, Role role) {
         this.name = name;
         this.nric = nric;
         this.age = age;
         this.maritalStatus = maritalStatus;
         this.password = password;
+        this.role = role;
     }
 
     /**
      * Default constructor for User class.
      */
     public User() {
-        this(null, null, 0, MaritalStatus.SINGLE, null);
+        this(null, null, 0, MaritalStatus.SINGLE, null, null);
     }
 
+    // Getters (and potentially Setters if needed, e.g., change password)
+    public String getName() {return name;}
+    public String getNric() { return nric; }
+    public String getPassword() { return password; } // Used for login check
+    public Role getRole() { return role; }
+    public int getAge() { return age; }
+    public MaritalStatus getMaritalStatus() { return maritalStatus; }
 
-    // Getter Methods
-
-    /**
-     * Returns the name of the user.
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the nric of the user.
-     * @return nric
-     */
-    public String getNric() {
-        return nric;
-    }
-
-    /**
-     * Returns the age of the user.
-     * @return age
-     */
-    public int getAge() {
-        return age;
-    }
-
-    /**
-     * Returns the marital status of the user.
-     * @return marital status
-     */
-    public MaritalStatus getMaritalStatus() {
-        return maritalStatus;
-    }
-
-    /**
-     * Returns the password of the user.
-     * @return password
-     */
-    public String getPassword() {
-        return password;
-    }
-
-
-    // Setter Methods
-
-    /**
-     * Updates the name of the user.
-     * @param name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Updates the nric of the user.
-     * @param nric
-     */
-    public void setNric(String nric) {
-        this.nric = nric;
-    }
-
-    /**
-     * Updates the age of the user.
-     * @param age
-     */
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    /**
-     * Updates the marital status of the user.
-     * @param maritalStatus
-     */
-    public void setMaritalStatus(MaritalStatus maritalStatus) {
-        this.maritalStatus = maritalStatus;
-    }
-
-    /**
-     * Updates the password of the user.
-     * @param password
-     */
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String newPassword) {
+        // Add validation for new password if needed
+        this.password = newPassword;
     }
 
 
@@ -135,8 +67,25 @@ abstract class User {
      * Override toString() method
      */
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(nric, user.nric);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nric);
+    }
+
+    @Override
     public String toString() {
-        return String.format("User %s:\n NRIC: %s\n Age: %s\n Marital Status: %s\n Password: %s", 
-        name, nric, age, maritalStatus, password);
+        return "User{" +
+               "nric='" + nric + '\'' +
+               ", role=" + role +
+               ", age=" + age +
+               ", maritalStatus='" + maritalStatus + '\'' +
+               '}';
     }
 }
