@@ -1,10 +1,9 @@
 package entities.project;
 
-import java.util.Date;
-import java.util.List;
-
 import entities.user.HDBManager;
 import entities.user.HDBOfficer;
+import java.util.Date;
+import java.util.List;
 
 public class Project {
     private String name;
@@ -19,9 +18,9 @@ public class Project {
     /**
      * Constructs a Project object.
      * 
-     * @param name                  the name of the entities.project
-     * @param neighbourhood         the neighbourhood of the entities.project
-     * @param flatType              the types of flats in the entities.project
+     * @param name                  the name of the project
+     * @param neighbourhood         the neighbourhood of the project
+     * @param flatType              the types of flats in the project
      * @param applicationOpenDate   the opening date of the applications
      * @param applicationCloseDate  the closing date of the applications
      */
@@ -46,7 +45,7 @@ public class Project {
     // Getter Methods
 
     /**
-     * Returns the name of the entities.project.
+     * Returns the name of the project.
      * @return name
      */
     public String getName() {
@@ -54,7 +53,7 @@ public class Project {
     }
 
     /**
-     * Returns the neighbourhood of the entities.project.
+     * Returns the neighbourhood of the project.
      * @return neighbourhood
      */
     public String getNeighbourhood() {
@@ -62,7 +61,7 @@ public class Project {
     }
 
     /**
-     * Returns the type of flats for the entities.project.
+     * Returns the type of flats for the project.
      * @return flatType
      */
     public List<FlatType> getFlatType() {
@@ -70,7 +69,7 @@ public class Project {
     }
 
     /**
-     * Returns the opening date of applications for the entities.project.
+     * Returns the opening date of applications for the project.
      * @return applicationOpenDate
      */
     public Date getApplicationOpenDate() {
@@ -78,7 +77,7 @@ public class Project {
     }
 
     /**
-     * Returns the closing date of applications for the entities.project.
+     * Returns the closing date of applications for the project.
      * @return applicationCloseDate
      */
     public Date getApplicationCloseDate() {
@@ -86,7 +85,7 @@ public class Project {
     }
 
     /**
-     * Returns the HDB Manager in charge for the entities.project.
+     * Returns the HDB Manager in charge for the project.
      * @return manager
      */
     public HDBManager getManager() {
@@ -94,7 +93,7 @@ public class Project {
     }
 
     /**
-     * Returns the HDB Officers for the entities.project.
+     * Returns the HDB Officers for the project.
      * @return officers
      */
     public HDBOfficer[] getOfficers() {
@@ -102,7 +101,7 @@ public class Project {
     }
 
     /**
-     * Returns the visibility of the entities.project.
+     * Returns the visibility of the project.
      * @return visibility
      */
     public boolean getVisibility() {
@@ -113,7 +112,7 @@ public class Project {
     // Setter Methods
 
     /**
-     * Sets the name of the entities.project.
+     * Sets the name of the project.
      * @param name
      */
     public void setName(String name) {
@@ -121,7 +120,7 @@ public class Project {
     }
 
     /**
-     * Sets the neighbourhood of the entities.project.
+     * Sets the neighbourhood of the project.
      * @param neighbourhood
      */
     public void setNeighbourhood(String neighbourhood) {
@@ -129,7 +128,7 @@ public class Project {
     }
 
     /**
-     * Sets the type of flats of the entities.project.
+     * Sets the type of flats of the project.
      * @param flatType
      */
     public void setFlatType(List<FlatType> flatType) {
@@ -137,7 +136,7 @@ public class Project {
     }
 
     /**
-     * Sets the opening date of applications for the entities.project.
+     * Sets the opening date of applications for the project.
      * @param applicationOpenDate
      */
     public void setApplicationOpenDate(Date applicationOpenDate) {
@@ -145,7 +144,7 @@ public class Project {
     }
 
     /**
-     * Sets the closing date of applications for the entities.project.
+     * Sets the closing date of applications for the project.
      * @param applicationCloseDate
      */
     public void setApplicationCloseDate(Date applicationCloseDate) {
@@ -153,7 +152,7 @@ public class Project {
     }
 
     /**
-     * Sets the HDB Manager in charge for the entities.project.
+     * Sets the HDB Manager in charge for the project.
      * @param manager
      */
     public void setManager(HDBManager manager) {
@@ -161,7 +160,7 @@ public class Project {
     }
 
     /**
-     * Sets the HDB Officers for the entities.project.
+     * Sets the HDB Officers for the project.
      * @param officers
      */
     public void getOfficers(HDBOfficer[] officers) {
@@ -169,7 +168,7 @@ public class Project {
     }
 
     /**
-     * Sets the visibility of the entities.project.
+     * Sets the visibility of the project.
      * @param visibility
      */
     public void isVisible(boolean visibility) {
