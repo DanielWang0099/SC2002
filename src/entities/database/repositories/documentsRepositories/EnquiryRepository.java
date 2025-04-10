@@ -14,7 +14,7 @@ public class EnquiryRepository implements IRepository<Enquiry, String> {
     private final Map<String, Enquiry> enquiryMap = new ConcurrentHashMap<>();
 
     // Package-private constructor
-    EnquiryRepository() {}
+    public EnquiryRepository() {}
 
     @Override
     public Enquiry save(Enquiry enquiry) {

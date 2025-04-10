@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import controller.*;
 import entities.user.User;
+import entities.database.*;
 // Import boundaries, controllers, models
 
 /**
@@ -18,9 +19,12 @@ public class MainCLI {
 
     public MainCLI() {
         this.scanner = new Scanner(System.in);
-        // Initialize the main controller, which initializes others and data
+        // Initialize the main controller, which initializes others and loads data via Database static block
         this.mainController = new MainController();
         this.authBoundary = new UserAuthenticationBoundary(scanner, mainController);
+         // Trigger Database initialization explicitly if needed (usually happens on first access)
+         Database.getUsersRepository(); // Example access
+         System.out.println("MainCLI Initialized. Ready to start.");
     }
 
     /**
@@ -51,6 +55,7 @@ public class MainCLI {
                     }
                     // Pause for user to read messages before showing menu again
                     System.out.println("\nPress Enter to continue...");
+                     // Consume potential leftover newline from previous input
                     scanner.nextLine();
                     break;
                 case 2: // Exit
@@ -60,6 +65,7 @@ public class MainCLI {
                     System.out.println("Invalid choice. Please enter 1 or 2.");
                      // Pause for user to read messages
                     System.out.println("\nPress Enter to continue...");
+                    // Consume potential leftover newline
                     scanner.nextLine();
                     break;
             }
@@ -78,6 +84,7 @@ public class MainCLI {
 
      /**
      * Safely reads an integer choice from the user.
+     * Handles potential NumberFormatException.
      * @param prompt The message to display to the user.
      * @return The user's integer choice, or -1 if input is invalid.
      */
@@ -86,9 +93,14 @@ public class MainCLI {
         int choice = -1;
         try {
             String line = scanner.nextLine();
-            choice = Integer.parseInt(line);
+            if (line != null && !line.trim().isEmpty()) {
+               choice = Integer.parseInt(line.trim());
+            } else {
+                 System.out.println("No input detected. Please enter a number.");
+            }
         } catch (NumberFormatException e) {
-           // Error message handled in the main loop's default case
+           // Error message handled in the main loop's default case,
+           // but we could log it here if needed.
         }
         return choice;
     }
@@ -101,6 +113,13 @@ public class MainCLI {
     private void dispatchToUserBoundary(User user) {
         BaseBoundary userBoundary = null;
 
+         // Check user object and role are not null before switching
+         if (user == null || user.getRole() == null) {
+              System.err.println("Error: Cannot dispatch boundary for null user or role.");
+              return;
+         }
+
+
         switch (user.getRole()) {
             case APPLICANT:
                 userBoundary = new ApplicantBoundary(scanner, mainController, user);
@@ -112,7 +131,8 @@ public class MainCLI {
                 userBoundary = new HdbManagerBoundary(scanner, mainController, user);
                 break;
             default:
-                System.out.println("Error: Unknown user role [" + user.getRole() + "]. Logging out.");
+                // This case should ideally not be reached if Role enum is used correctly
+                System.out.println("Error: Unknown user role encountered [" + user.getRole() + "]. Logging out.");
                 return; // Exit dispatch method
         }
 
@@ -123,12 +143,23 @@ public class MainCLI {
     }
 
     /**
-     * Cleans up resources and exits.
+     * Cleans up resources, saves data, and exits the application.
      */
     public void exit() {
-        System.out.println("\nExiting BTO Management System. Goodbye!");
+        System.out.println("\nExiting BTO Management System...");
+
+        // --- SAVE ALL DATA ---
+        // Calls the static method in the Database facade to trigger saves in repositories
+        System.out.println("Saving data to files...");
+        Database.saveAllData();
+        System.out.println("Data saving complete.");
+        // --- --------------- ---
+
+        System.out.println("Goodbye!");
         if (scanner != null) {
+            // Close scanner to release system resources
             scanner.close();
+            System.out.println("Scanner closed.");
         }
         System.exit(0); // Terminate the application
     }
@@ -138,7 +169,24 @@ public class MainCLI {
      * @param args Command line arguments (not used).
      */
     public static void main(String[] args) {
-        MainCLI application = new MainCLI();
-        application.start();
+        // Optional: Add a try-catch block here for any unhandled exceptions during startup
+        try {
+             System.out.println("Application starting...");
+             // The Database static block will run when MainCLI constructor accesses it,
+             // ensuring data is loaded before the application starts fully.
+            MainCLI application = new MainCLI();
+            application.start();
+        } catch (Exception e) {
+             System.err.println("An unexpected error occurred during application startup or execution: " + e.getMessage());
+             e.printStackTrace(); // Print stack trace for debugging
+             // Optionally attempt a final save before exiting on error
+             try {
+                 System.err.println("Attempting emergency data save...");
+                 Database.saveAllData();
+             } catch (Exception saveEx) {
+                  System.err.println("Emergency save failed: " + saveEx.getMessage());
+             }
+             System.exit(1); // Exit with error code
+        }
     }
 }

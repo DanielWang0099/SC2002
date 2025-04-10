@@ -13,7 +13,7 @@ public class WithdrawalRepository implements IRepository<Withdrawal, String> {
     private final Map<String, Withdrawal> withdrawalMap = new ConcurrentHashMap<>();
 
      // Package-private constructor
-    WithdrawalRepository() {}
+    public WithdrawalRepository() {}
 
     @Override
     public Withdrawal save(Withdrawal withdrawal) {

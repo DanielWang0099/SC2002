@@ -23,20 +23,10 @@ public final class Database { // final keyword prevents subclassing
     // before any other part of the application tries to access them.
     static {
         System.out.println("Database Facade: Initializing repositories...");
-
-        // Instantiate the UsersRepository facade. Its constructor will handle
-        // creating the Applicant/Officer/Manager repositories and loading user data.
+        // Init order matters if repos depend on each other during load (e.g., Project load needs Users)
         usersRepository = new UsersRepository();
-
-        // Instantiate the ProjectsRepository. Its constructor should handle
-        // loading project data (if applicable).
-        // TODO: Ensure the Project model class exists and is used correctly here.
         projectsRepository = new ProjectsRepository();
-
-        // Instantiate the DocumentsRepository. Its constructor should handle
-        // loading any persistent documents (if applicable).
-        documentsRepository = new DocumentsRepository();
-
+        documentsRepository = new DocumentsRepository(); // Initialize this too
         System.out.println("Database Facade: All repositories initialized.");
     }
 
@@ -44,34 +34,21 @@ public final class Database { // final keyword prevents subclassing
     // This enforces the static-only access pattern.
     private Database() {}
 
-    // --- Static "getter" methods ---
-    // These methods provide controlled access to the single repository instances.
+    // --- Getters ---
+    public static UsersRepository getUsersRepository() { return usersRepository; }
+    public static ProjectsRepository getProjectsRepository() { return projectsRepository; }
+    public static DocumentsRepository getDocumentsRepository() { return documentsRepository; } // Getter for docs
 
     /**
-     * Gets the singleton instance of the UsersRepository facade.
-     * @return The UsersRepository instance.
+     * Saves all persistent data (Users, Projects) to their respective files.
+     * Call this before application shutdown.
      */
-    public static UsersRepository getUsersRepository() {
-        return usersRepository;
-    }
-
-    /**
-     * Gets the singleton instance of the ProjectsRepository.
-     * @return The ProjectsRepository instance.
-     */
-    public static ProjectsRepository getProjectsRepository() {
-        // Optional: Add checks or warnings if the Project model isn't fully implemented yet
-        // if (projectsRepository == null /* or Project class check fails */) {
-        //     System.err.println("Warning: ProjectsRepository accessed but might depend on unimplemented Project model.");
-        // }
-        return projectsRepository;
-    }
-
-    /**
-     * Gets the singleton instance of the DocumentsRepository.
-     * @return The DocumentsRepository instance.
-     */
-    public static DocumentsRepository getDocumentsRepository() {
-        return documentsRepository;
+    public static void saveAllData() {
+        System.out.println("Database Facade: Saving all data...");
+        // TODO: Add save methods to Document repositories if needed and call here
+        usersRepository.saveAllUsers();
+        projectsRepository.saveToFile(); // Add save method to Projects repo if not using facade pattern there
+        // documentsRepository.saveAllDocuments(); // If implemented
+        System.out.println("Database Facade: Finished saving all data.");
     }
 }

@@ -1,14 +1,10 @@
 package entities.database.repositories;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import entities.database.repositories.documentsRepositories.*;
 import entities.documents.approvableDocuments.*;
-import entities.database.repositories.*;
 import entities.documents.*;
 import entities.documents.repliableDocuments.*;
 import java.util.stream.Stream;
@@ -25,7 +21,7 @@ public class DocumentsRepository { // Not implementing IRepository<IBaseSubmitta
     private final EnquiryRepository enquiryRepository;
 
     // Package-private constructor, managed by Database facade
-    DocumentsRepository() {
+    public DocumentsRepository() {
         System.out.println("Initializing DocumentsRepository Facade...");
         this.applicationRepository = new ApplicationRepository();
         this.registrationRepository = new RegistrationRepository();
