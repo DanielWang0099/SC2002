@@ -1,11 +1,13 @@
 package entities.request;
 
+import entities.documents.DocumentType;
+
 public class Request {
     private final String requestID;
     private String title;
     private final String senderID;
     private final String projectID;
-    private final RequestType requestType;
+    private final DocumentType requestType;
     private RequestStatus requestStatus;
 
     /**
@@ -19,7 +21,7 @@ public class Request {
      * @param requestStatus Status of request
      */
     public Request(String requestID, String title, String senderID,
-    String projectID, RequestType requestType, RequestStatus requestStatus) {
+    String projectID, DocumentType requestType, RequestStatus requestStatus) {
         this.requestID = requestID;
         this.title = title;
         this.senderID = senderID;
@@ -67,7 +69,7 @@ public class Request {
      * Returns the type of the request.
      * @return requestType
      */
-    public RequestType getRequestType() {
+    public DocumentType getRequestType() {
         return requestType;
     }
 
