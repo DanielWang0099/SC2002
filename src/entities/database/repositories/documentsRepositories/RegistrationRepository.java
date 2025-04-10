@@ -13,7 +13,7 @@ public class RegistrationRepository implements IRepository<ProjectRegistration, 
     private final Map<String, ProjectRegistration> registrationMap = new ConcurrentHashMap<>();
 
     // Package-private constructor
-    RegistrationRepository() {}
+    public RegistrationRepository() {}
 
     @Override
     public ProjectRegistration save(ProjectRegistration registration) {

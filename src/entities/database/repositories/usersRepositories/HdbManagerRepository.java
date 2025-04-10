@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 import java.util.ArrayList;
 import entities.user.*;
 import entities.database.repositories.IRepository;
@@ -14,7 +13,7 @@ public class HdbManagerRepository implements IRepository<HdbManager, String> {
     private final Map<String, HdbManager> managerMap = new ConcurrentHashMap<>();
 
     // Package-private constructor
-   HdbManagerRepository() {}
+   public HdbManagerRepository() {}
 
    @Override
    public HdbManager save(HdbManager manager) {

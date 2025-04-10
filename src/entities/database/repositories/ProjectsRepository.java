@@ -21,7 +21,7 @@ public class ProjectsRepository implements IRepository<Project, String> {
     private final Map<String, Project> projectMap = new ConcurrentHashMap<>();
 
     // Package-private constructor
-    ProjectsRepository() {
+    public ProjectsRepository() {
         System.out.println("Initializing ProjectsRepository...");
         loadInitialProjects(); // Load sample/persistent data if needed
         System.out.println("ProjectsRepository initialized with " + projectMap.size() + " projects.");

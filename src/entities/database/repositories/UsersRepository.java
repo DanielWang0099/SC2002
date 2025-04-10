@@ -17,7 +17,7 @@ public class UsersRepository {
     private final HdbManagerRepository hdbManagerRepository;
 
     // Package-private constructor, managed by Database facade
-    UsersRepository() {
+    public UsersRepository() {
         System.out.println("Initializing UsersRepository Facade...");
         this.applicantRepository = new ApplicantRepository();
         this.hdbOfficerRepository = new HdbOfficerRepository();

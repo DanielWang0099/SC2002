@@ -22,7 +22,7 @@ public class ApplicationAccessController {
      * Checks if the applicant, who is single, meets the elibility criteria
      */
     private boolean eligibleForSingle(Project project) {
-        return project.getFlatType().contains(FlatType.TWO_ROOM);
+        return project.getInitialUnitCount(FlatType.TWO_ROOM) != 0;
     }
 
 }
