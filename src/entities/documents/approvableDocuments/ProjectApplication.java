@@ -5,33 +5,50 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
+import entities.project.*;
 
 
 public class ProjectApplication implements IApprovableDocument {
 
     private final String documentID;
-    private User applicant; // The user applying
-    // private Project project; // The project being applied for
+    private User applicant;
     private DocumentStatus status;
     private LocalDateTime submissionDate;
     private LocalDateTime lastModifiedDate;
     private User lastModifiedBy;
     private String rejectionReason; // Store reason if rejected
     private DocumentType documentType;
+    private String projectName;
 
-    public ProjectApplication(User applicant /*, Project project*/) {
-        this.documentID = "APP-" + UUID.randomUUID().toString().substring(0, 8);
-        this.applicant = applicant;
-        // this.project = project;
-        this.status = DocumentStatus.DRAFT; // Start as draft
-        this.submissionDate = null;
-        this.lastModifiedDate = LocalDateTime.now();
-        this.lastModifiedBy = applicant;
+    public ProjectApplication(String documentID,
+                              User applicant,
+                              Project project,
+                              DocumentStatus status,
+                              LocalDateTime submissionDate,
+                              LocalDateTime lastModifiedDate,
+                              User lastModifiedBy,
+                              String rejectionReason) {
+        this.documentID = (documentID == null || documentID.trim().isEmpty())
+                          ? "APP-" + UUID.randomUUID().toString().substring(0, 8)
+                          : documentID;
         this.documentType = DocumentType.APPLICATION;
-        System.out.println("Created Draft Project Application: " + documentID);
+        this.applicant = applicant;
+        this.projectName = project.getName();
+        this.status = status;
+        this.submissionDate = submissionDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.lastModifiedBy = lastModifiedBy;
+        this.rejectionReason = rejectionReason;
+        System.out.println("Created Project Application: " + this.documentID);
     }
 
-    // --- Interface Methods Implementation (Stubs) ---
+    public static ProjectApplication createNewProjectApplication(User applicant, Project project) {
+        LocalDateTime now = LocalDateTime.now();
+        // Sets status to DRAFT, submissionDate to null, and lastModifiedDate to now.
+        return new ProjectApplication(null, applicant, project, DocumentStatus.DRAFT, null, now, applicant, null);
+    }
+
+
 
     @Override
     public String getDocumentID() {
@@ -128,7 +145,25 @@ public class ProjectApplication implements IApprovableDocument {
 
      // --- Getters for specific fields ---
      public String getRejectionReason() { return rejectionReason; }
-     // Add getters for project, dates etc. as needed
+     public String getProjectName() { return projectName; }
+     
+     // New getters for remaining attributes:
+     public LocalDateTime getSubmissionDate() {
+         return submissionDate;
+     }
+     
+     public LocalDateTime getLastModifiedDate() {
+         return lastModifiedDate;
+     }
+     
+     public User getLastModifiedBy() {
+         return lastModifiedBy;
+     }
+     
+     // Optional: Getter for applicant (alias to getSubmitter)
+     public User getApplicant() {
+         return applicant;
+     }
 }
 
 

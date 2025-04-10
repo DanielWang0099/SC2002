@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
-
+import entities.project.*;
 
 public class Withdrawal implements IApprovableDocument {
 
@@ -18,24 +18,42 @@ public class Withdrawal implements IApprovableDocument {
     private User lastModifiedBy;
     private String rejectionReason; // Reason withdrawal rejected
     private DocumentType documentType;
+    private String projectName;
 
 
-     public Withdrawal(User applicant, ProjectApplication applicationToWithdraw) {
+    public Withdrawal(String documentID,
+                      User applicant,
+                      ProjectApplication applicationToWithdraw,
+                      Project project,
+                      DocumentStatus status,
+                      LocalDateTime submissionDate,
+                      LocalDateTime lastModifiedDate,
+                      User lastModifiedBy,
+                      String rejectionReason) {
         if (applicationToWithdraw == null) {
-             throw new IllegalArgumentException("Application to withdraw cannot be null.");
+            throw new IllegalArgumentException("Application to withdraw cannot be null.");
         }
-        this.documentID = "WDR-" + UUID.randomUUID().toString().substring(0, 8);
+        this.documentID = (documentID == null || documentID.trim().isEmpty())
+                          ? "WDR-" + UUID.randomUUID().toString().substring(0, 8)
+                          : documentID;
         this.applicant = applicant;
+        this.projectName = project.getName();
         this.applicationToWithdraw = applicationToWithdraw;
-        this.status = DocumentStatus.DRAFT; // Request starts as draft
-        this.submissionDate = null;
-        this.lastModifiedDate = LocalDateTime.now();
-        this.lastModifiedBy = applicant;
-        this.documentType = DocumentType.APPLICATION;
-         System.out.println("Created Draft Withdrawal Request: " + documentID + " for Application " + applicationToWithdraw.getDocumentID());
+        this.status = status;
+        this.submissionDate = submissionDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.lastModifiedBy = lastModifiedBy;
+        this.rejectionReason = rejectionReason;
+        // Optionally, change DocumentType if a dedicated WITHDRAWAL type exists.
+        this.documentType = DocumentType.APPLICATION; 
+        System.out.println("Created Withdrawal Request: " + this.documentID + " for Application " + applicationToWithdraw.getDocumentID());
     }
 
-    // --- Interface Methods Implementation (Stubs - adapt logic for withdrawal) ---
+    public static Withdrawal createNewWithdrawal(User applicant, ProjectApplication applicationToWithdraw, Project project) {
+        LocalDateTime now = LocalDateTime.now();
+        // Sets status to DRAFT, submissionDate to null, and lastModifiedDate to now.
+        return new Withdrawal(null, applicant, applicationToWithdraw, project, DocumentStatus.DRAFT, null, now, applicant, null);
+    }
 
     @Override
     public String getDocumentID() { return documentID; }
@@ -122,6 +140,23 @@ public class Withdrawal implements IApprovableDocument {
       public ProjectApplication getApplicationToWithdraw() {
           return applicationToWithdraw;
       }
+
+    public String getProjectName() { return projectName; }
+    public LocalDateTime getSubmissionDate() {
+        return submissionDate;
+    }
+    
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+    
+    public User getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+    
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
 }
 
 

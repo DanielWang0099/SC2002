@@ -5,6 +5,7 @@ import entities.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import entities.documents.DocumentType;
+import entities.project.*;
 
 public class Enquiry implements IReplyableDocument {
 
@@ -20,21 +21,55 @@ public class Enquiry implements IReplyableDocument {
     private User lastModifiedBy;
     private LocalDateTime replyDate;
     private DocumentType documentType;
+    private String projectName;
 
 
-     public Enquiry(User submitter, /*Project project,*/ String enquiryContent) {
-        this.documentID = "ENQ-" + UUID.randomUUID().toString().substring(0, 8);
+    public Enquiry(String documentID,
+                   User submitter,
+                   Project project,
+                   String enquiryContent,
+                   DocumentStatus status,
+                   LocalDateTime submissionDate,
+                   LocalDateTime lastModifiedDate,
+                   User lastModifiedBy,
+                   String replyContent,
+                   User replier,
+                   LocalDateTime replyDate) {
+        this.documentID = (documentID == null || documentID.trim().isEmpty())
+                          ? "ENQ-" + UUID.randomUUID().toString().substring(0, 8)
+                          : documentID;
         this.submitter = submitter;
-        // this.project = project;
+        this.projectName = project.getName();
         this.enquiryContent = enquiryContent;
-        this.status = DocumentStatus.DRAFT; // Starts as draft
-        this.submissionDate = null;
-        this.lastModifiedDate = LocalDateTime.now();
-        this.lastModifiedBy = submitter;
+        this.status = status;
+        this.submissionDate = submissionDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.lastModifiedBy = lastModifiedBy;
+        this.replyContent = replyContent;
+        this.replier = replier;
+        this.replyDate = replyDate;
+        // Optionally, change DocumentType if a dedicated ENQUIRY type exists.
         this.documentType = DocumentType.APPLICATION;
-         System.out.println("Created Draft Enquiry: " + documentID);
+        System.out.println("Created Enquiry: " + this.documentID);
     }
 
+    public static Enquiry createNewEnquiry(User submitter, Project project, String enquiryContent) {
+        LocalDateTime now = LocalDateTime.now();
+        // Sets status to DRAFT, submissionDate to null, and lastModifiedDate to now.
+        return new Enquiry(
+            null,
+            submitter,
+            project,
+            enquiryContent,
+            DocumentStatus.DRAFT,
+            null,
+            now,
+            submitter,
+            null,
+            null,
+            null
+        );
+    }
 
     // --- Interface Methods Implementation (Stubs - adapt for reply logic) ---
     @Override
@@ -122,5 +157,22 @@ public class Enquiry implements IReplyableDocument {
 
      // --- Other Getters ---
      public String getEnquiryContent() { return enquiryContent; }
-     // Add getters for project, dates etc.
+     public String getProjectName() { return projectName; }
+
+          // New getters for remaining attributes:
+    public LocalDateTime getSubmissionDate() {
+            return submissionDate;
+        }
+        
+    public LocalDateTime getLastModifiedDate() {
+            return lastModifiedDate;
+        }
+        
+    public User getLastModifiedBy() {
+            return lastModifiedBy;
+        }
+
+    public LocalDateTime getReplyDate() {
+        return replyDate;
+    }
 }

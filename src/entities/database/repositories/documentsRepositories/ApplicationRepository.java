@@ -1,23 +1,112 @@
 package entities.database.repositories.documentsRepositories;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.Date;
 import entities.documents.approvableDocuments.*;
+import entities.user.User;
+import utilities.CsvUtil;
+import entities.database.Database;
 import entities.database.repositories.*;
 import entities.documents.*;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
+import entities.project.*;
 
 /**
  * Repository specifically for managing ProjectApplication entities.
  */
 public class ApplicationRepository implements IRepository<ProjectApplication, String> {
     private final Map<String, ProjectApplication> applicationMap = new ConcurrentHashMap<>();
+    private final String filename = "data/applications.csv";
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
     // Package-private constructor
-    public ApplicationRepository() {}
+    public ApplicationRepository() {
+        loadFromFile();
+    }
+
+    private void loadFromFile() {
+        // Note: Assumes Users and Projects Repositories are already loaded for lookups!
+        List<ProjectApplication> loaded = CsvUtil.readCsv(filename, this::mapRowToApplication, true);
+        loaded.forEach(this::save); // Populate map via save method
+        System.out.println("Loaded " + applicationMap.size() + " applications from " + filename);
+    }
+
+    public void saveToFile() {
+        String[] header = {"DocumentID", "ApplicantNRIC", "ProjectName", "Status",
+                           "SubmissionDate", "LastModifiedDate", "LastModifiedByNRIC", "RejectionReason"};
+        CsvUtil.writeCsv(filename, findAll(), this::mapApplicationToRow, header);
+    }
+
+    private ProjectApplication mapRowToApplication(String[] row) {
+        try {
+            if (row.length < 8) throw new IllegalArgumentException("Incorrect number of columns for application");
+
+            String docId = row[0];
+            String applicantNric = row[1];
+            String projectName = row[2];
+            DocumentStatus status = DocumentStatus.valueOf(row[3].toUpperCase());
+            Date submissionDate = parseDate(row[4]); // Use helper
+            Date lastModDate = parseDate(row[5]);    // Use helper
+            String lastModByNric = row[6];
+            String rejectionReason = row[7];
+
+            // Lookup Applicant (essential)
+            Optional<User> applicantOpt = Database.getUsersRepository().findUserByNric(applicantNric);
+            Optional<Project> projectOpt = Database.getProjectsRepository().findById(projectName);
+            Optional<User> lastModByOpt = Database.getUsersRepository().findUserByNric(lastModByNric);
+
+            if (!applicantOpt.isPresent() || !projectOpt.isPresent() || !lastModByOpt.isPresent()) {
+                if (!applicantOpt.isPresent()) {
+                    System.err.println("Applicant not found for NRIC: " + applicantNric);
+                }
+                if (!projectOpt.isPresent()) {
+                    System.err.println("Project not found for project name: " + projectName);
+                }
+                if (!lastModByOpt.isPresent()) {
+                    System.err.println("Last modifier not found for NRIC: " + lastModByNric);
+                }
+                return null;
+            } else {
+                User applicant = applicantOpt.get();
+                Project project = projectOpt.get();
+                User lastModBy = lastModByOpt.get();
+                
+                ProjectApplication app = new ProjectApplication(docId, applicant, project, status, 
+                                              toLocalDateTime(submissionDate), toLocalDateTime(lastModDate), 
+                                              lastModBy, rejectionReason);
+                return app;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error mapping row to ProjectApplication: " + String.join(",", row) + " | Error: " + e.getMessage());
+            return null;
+        }
+    }
+
+     private String[] mapApplicationToRow(ProjectApplication app) {
+        return new String[]{
+                app.getDocumentID(),
+                app.getSubmitter() != null ? app.getSubmitter().getNric() : "",
+                app.getProjectName() != null ? app.getProjectName() : "",
+                app.getStatus() != null ? app.getStatus().name() : "",
+                app.getSubmissionDate() != null ? formatDate(app.getSubmissionDate()) : "", // Add getter if missing
+                app.getLastModifiedDate() != null ? formatDate(app.getLastModifiedDate()) : "", // Add getter if missing
+                app.getLastModifiedBy() != null ? app.getLastModifiedBy().getNric() : "", // Add getter/field if missing
+                app.getRejectionReason() != null ? app.getRejectionReason() : ""
+        };
+    }
 
     @Override
     public ProjectApplication save(ProjectApplication application) {
@@ -103,4 +192,19 @@ public class ApplicationRepository implements IRepository<ProjectApplication, St
         return new ArrayList<>(); // Placeholder
     }
 
+    private String formatDate(LocalDateTime ldt) {
+        if (ldt == null) return "";
+        Instant instant = ldt.atZone(ZoneId.systemDefault()).toInstant(); // Or ZoneId.of("UTC")
+        return DATE_FORMAT.format(Date.from(instant));
+    }
+
+    private Date parseDate(String dateString) throws ParseException {
+        if (dateString == null || dateString.isEmpty()) return null;
+        return DATE_FORMAT.parse(dateString);
+    }
+
+     private LocalDateTime toLocalDateTime(Date date) {
+        if (date == null) return null;
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(); // Or ZoneId.of("UTC")
+    }
 }
