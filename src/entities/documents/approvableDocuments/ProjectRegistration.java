@@ -5,32 +5,49 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
-
+import entities.project.*;
 
 public class ProjectRegistration implements IApprovableDocument {
 
     private final String documentID;
-    private User officer; // Officer requesting registration
-    // private Project project; // Project to register for
+    private User officer;
     private DocumentStatus status;
     private LocalDateTime submissionDate;
     private LocalDateTime lastModifiedDate;
     private User lastModifiedBy;
     private String rejectionReason;
     private DocumentType documentType;
+    private String projectName;
 
-     public ProjectRegistration(User officer /*, Project project*/) {
-        this.documentID = "REG-" + UUID.randomUUID().toString().substring(0, 8);
+    public ProjectRegistration(String documentID,
+                               User officer,
+                               Project project,
+                               DocumentStatus status,
+                               LocalDateTime submissionDate,
+                               LocalDateTime lastModifiedDate,
+                               User lastModifiedBy,
+                               String rejectionReason) {
+        this.documentID = (documentID == null || documentID.trim().isEmpty())
+                          ? "REG-" + UUID.randomUUID().toString().substring(0, 8)
+                          : documentID;
         this.officer = officer;
-        // this.project = project;
-        this.status = DocumentStatus.DRAFT;
-        this.submissionDate = null;
-        this.lastModifiedDate = LocalDateTime.now();
-        this.lastModifiedBy = officer;
-        this.documentType = DocumentType.APPLICATION;
-         System.out.println("Created Draft Project Registration: " + documentID);
+        this.projectName = project.getName();
+        this.status = status;
+        this.submissionDate = submissionDate;
+        this.lastModifiedDate = lastModifiedDate;
+        this.lastModifiedBy = lastModifiedBy;
+        this.rejectionReason = rejectionReason;
+        // Optionally, change DocumentType if a dedicated REGISTRATION type exists.
+        this.documentType = DocumentType.REGISTRATION; 
+        System.out.println("Created Project Registration: " + this.documentID);
     }
 
+    // New factory method for new registrations using current time.
+    public static ProjectRegistration createNewProjectRegistration(User officer, Project project) {
+        LocalDateTime now = LocalDateTime.now();
+        // Sets status to DRAFT, submissionDate to null, and lastModifiedDate to now.
+        return new ProjectRegistration(null, officer, project, DocumentStatus.DRAFT, null, now, officer, null);
+    }
     // --- Interface Methods Implementation (Stubs - similar to ProjectApplication) ---
 
     @Override
@@ -117,8 +134,27 @@ public class ProjectRegistration implements IApprovableDocument {
           System.out.println("Rejection failed for " + documentID + ". Invalid status ("+this.status+") or rejector role/project assignment.");
          return false;
     }
-     // Add specific getters as needed
-}
+    public String getProjectName() { return projectName; }
 
+    public LocalDateTime getSubmissionDate() {
+        return submissionDate;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public User getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public User getOfficer() {
+        return officer;
+    }
+}
 
 //---
