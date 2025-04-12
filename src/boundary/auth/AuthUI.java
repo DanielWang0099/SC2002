@@ -29,22 +29,21 @@ public class AuthUI {
     }
 
     /**
-     * Prompts for NRIC until valid format is entered
-     * @return Valid NRIC in uppercase
+     * Prompts for NRIC until valid format is entered.
+     * @return Valid NRIC in uppercase.
      */
     private static String promptValidNric() {
         while(true) {
             String input = StringScanner.scan("Enter NRIC (e.g., S1234567A): ")
-                                    .trim()
-                                    .toUpperCase();
+                .trim().toUpperCase();
             
             if(ValidateNRIC.isValidNric(input)) return input;
-            System.out.println("Invalid NRIC! Please follow the format: S/TXXXXXXX[X]");
+            System.out.println("Invalid NRIC! Please follow the format: [S/T]XXXXXXX[A-Z]");
         }
     }
 
     /**
-     * Redirects user to appropriate main page based on role
+     * Redirects user to appropriate main page based on role.
      */
     private static void redirectBasedOnRole(User user) {
         switch(user.getRole()) {

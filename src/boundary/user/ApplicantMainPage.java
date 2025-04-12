@@ -5,7 +5,15 @@ import entity.user.User;
 import utils.io.IntScanner;
 import utils.ui.MenuBuilder;
 
+/**
+ * Provides the main interface for Applicants.
+ * Manages navigation between Applicant-specific functionalities.
+ */
 public class ApplicantMainPage {
+    /**
+     * Initializes and manages the Applicant dashboard interface.
+     * @param user  The authenticated Applicant user instance.
+     */
     public static void start(User user) {
         boolean logout = false;
         try {
