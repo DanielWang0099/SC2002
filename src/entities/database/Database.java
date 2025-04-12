@@ -45,10 +45,9 @@ public final class Database { // final keyword prevents subclassing
      */
     public static void saveAllData() {
         System.out.println("Database Facade: Saving all data...");
-        // TODO: Add save methods to Document repositories if needed and call here
-        usersRepository.saveAllUsers();
-        projectsRepository.saveToFile(); // Add save method to Projects repo if not using facade pattern there
-        // documentsRepository.saveAllDocuments(); // If implemented
+        usersRepository.saveAllUsers();         // Saves applicants.csv, hdb_officers.csv, hdb_managers.csv
+        projectsRepository.saveToFile();        // Saves projects.csv
+        documentsRepository.saveAllDocuments(); // Saves applications.csv, enquiries.csv, etc.
         System.out.println("Database Facade: Finished saving all data.");
     }
 }

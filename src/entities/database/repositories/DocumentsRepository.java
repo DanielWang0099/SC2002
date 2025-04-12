@@ -60,6 +60,15 @@ public class DocumentsRepository { // Not implementing IRepository<IBaseSubmitta
         }
     }
 
+    public void saveAllDocuments() {
+        System.out.println("Saving all user types to CSV...");
+        applicationRepository.saveToFile();
+        registrationRepository.saveToFile();
+        withdrawalRepository.saveToFile();
+        enquiryRepository.saveToFile();
+        System.out.println("Finished saving user data.");
+    }
+
     /**
      * Finds any document by its ID. Uses prefixes (APP-, REG-, WDR-, ENQ-) for efficiency.
      * @param documentId The unique ID of the document.
