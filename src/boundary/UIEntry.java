@@ -24,18 +24,8 @@ public class UIEntry {
      */
     public static void start() {
         if (isFirstStart()) {
-            System.out.println("First start! Performing first time initialisation...");
-
-            // Initialize AccountController and load user data from csv
-            AccountController accountController = new AccountController();
-            accountController.loadApplicantsFromCSV("data/applicants.csv");
-            accountController.loadOfficersFromCSV("data/hdb_officers.csv");
-            accountController.loadManagersFromCSV("data/hdb_managers.csv");
-
-            // Check account initialisation
-            AccountRepository accountRepo = AccountRepository.getInstance();
-            accountRepo.getAllUsers().forEach(System.out::println);;
-            System.out.println("System initialisation complete!");
+            System.out.println("[BTOMS] Performing first time initialisation...");
+            AccountController.initializeUserData();
         }
         MainMenu.start();
     }

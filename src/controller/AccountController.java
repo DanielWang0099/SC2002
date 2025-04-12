@@ -4,9 +4,10 @@ import entity.user.Applicant;
 import entity.user.HdbManager;
 import entity.user.HdbOfficer;
 import entity.user.User;
+import entity.repository.AccountRepository;
 import enums.UserRole;
 import enums.MaritalStatus;
-import entity.repository.AccountRepository;
+import utils.io.CsvUserLoader;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -38,7 +39,8 @@ public class AccountController {
      * @param oldPassword   Current password
      * @param newPassword   New password
      * 
-     * @return true if password changed successfully
+     * @return  {@code true} if password changed successfully,
+     *          {@code false} otherwise.
      */
     public static boolean changePassword(String nric, String oldPassword, String newPassword) {
         User user = accountRepo.findUserByNric(nric);
@@ -53,81 +55,17 @@ public class AccountController {
     // LOADING METHODS
 
     /**
-     * Loads applicants from CSV
+     * Loads all initial user data during program startup.
      */
-    public void loadApplicantsFromCSV(String filePath) {
-        loadUsersFromCSV(filePath, UserRole.APPLICANT);
-    }
-
-    /**
-     * Loads HDB officers from CSV
-     */
-    public void loadOfficersFromCSV(String filePath) {
-        loadUsersFromCSV(filePath, UserRole.HDB_OFFICER);
-    }
-
-    /**
-     * Loads HDB managers from CSV
-     */
-    public void loadManagersFromCSV(String filePath) {
-        loadUsersFromCSV(filePath, UserRole.HDB_MANAGER);
-    }
-
-    /**
-     * Generic CSV loader with user type differentiation
-     */
-    private void loadUsersFromCSV(String filePath, UserRole UserRole) {
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            boolean isHeader = true;
-            while ((line = br.readLine()) != null) {
-                if (isHeader) {
-                    isHeader = false;
-                    continue;
-                }
-                processCSVLine(line, UserRole);
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Processes individual CSV line based on user type
-     */
-    private void processCSVLine(String line, UserRole UserRole) {
-        String[] data = line.split(",", -1);
-        if (data.length != 5) {
-            System.err.println("Invalid data format in line: " + line);
-            return;
-        }
-
+    public static void initializeUserData() {
         try {
-            User user = createUserFromData(data, UserRole);
-            accountRepo.addUser(user);
-        } catch (NumberFormatException e) {
-            System.err.println("Invalid age in line: " + line);
-        } catch (IllegalArgumentException e) {
-            System.err.println("Invalid data in line: " + line);
+            CsvUserLoader loader = new CsvUserLoader(accountRepo);
+            loader.loadUsersFromCSV("data/applicants.csv", UserRole.APPLICANT);
+            loader.loadUsersFromCSV("data/hdb_officers.csv", UserRole.HDB_OFFICER);
+            loader.loadUsersFromCSV("data/hdb_managers.csv", UserRole.HDB_MANAGER);
+        } catch (Exception e) {
+            System.err.println("Failed to initialise user data: " + e.getMessage());
         }
-    }
-
-    /**
-     * User creation by role
-     */
-    private User createUserFromData(String[] data, UserRole UserRole) 
-        throws IllegalArgumentException {
-        String name = data[0].trim();
-        String nric = data[1].trim();
-        String password = data[2].trim();
-        int age = Integer.parseInt(data[3].trim());
-        MaritalStatus maritalStatus = MaritalStatus.valueOf(data[4].trim().toUpperCase());
-
-        return switch (UserRole) {
-            case APPLICANT -> new Applicant(name, nric, age, maritalStatus, password);
-            case HDB_OFFICER -> new HdbOfficer(name, nric, age, maritalStatus, password);
-            case HDB_MANAGER -> new HdbManager(name, nric, age, maritalStatus, password);
-        };
+        System.out.println("[AccountController] User data initialisation completed!");
     }
 }
