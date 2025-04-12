@@ -26,9 +26,10 @@ The Build-To-Order Management System (BTOMS) is a Java-based command line interf
 
 ## Features
 - [ ] **System**
-  - [ ] Login.
-  - [ ] View profile.
-  - [ ] Change password.
+  - [x] User login.
+  - [x] View role-specific dashboards.
+  - [x] NRIC validation.
+  - [x] Change password, and prompts re-login.
   - [ ] Filter for project listing (user's setting persists throughout program execution).
 - [ ] **Applicant**
     - [ ] View available projects.
