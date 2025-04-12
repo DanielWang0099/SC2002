@@ -16,7 +16,6 @@ import entities.database.Database;
 import entities.database.repositories.*;
 import entities.documents.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -28,7 +27,6 @@ import entities.project.*;
 public class ApplicationRepository implements IRepository<ProjectApplication, String> {
     private final Map<String, ProjectApplication> applicationMap = new ConcurrentHashMap<>();
     private final String filename = "data/applications.csv";
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
     // Package-private constructor
@@ -44,50 +42,50 @@ public class ApplicationRepository implements IRepository<ProjectApplication, St
     }
 
     public void saveToFile() {
+        // Added BookedFlatType column
         String[] header = {"DocumentID", "ApplicantNRIC", "ProjectName", "Status",
-                           "SubmissionDate", "LastModifiedDate", "LastModifiedByNRIC", "RejectionReason"};
+                           "SubmissionDate", "LastModifiedDate", "LastModifiedByNRIC",
+                           "RejectionReason", "BookedFlatType"};
         CsvUtil.writeCsv(filename, findAll(), this::mapApplicationToRow, header);
     }
 
     private ProjectApplication mapRowToApplication(String[] row) {
         try {
-            if (row.length < 8) throw new IllegalArgumentException("Incorrect number of columns for application");
+            // Expect 9 columns now
+            if (row.length < 9) throw new IllegalArgumentException("Application CSV: Incorrect number of columns. Expected 9+, got " + row.length);
 
             String docId = row[0];
             String applicantNric = row[1];
             String projectName = row[2];
             DocumentStatus status = DocumentStatus.valueOf(row[3].toUpperCase());
-            Date submissionDate = parseDate(row[4]); // Use helper
-            Date lastModDate = parseDate(row[5]);    // Use helper
+            // Use helper methods that return LocalDateTime or null
+            LocalDateTime submissionDate = toLocalDateTime(parseDate(row[4]));
+            LocalDateTime lastModDate = toLocalDateTime(parseDate(row[5]));
             String lastModByNric = row[6];
             String rejectionReason = row[7];
+            FlatType bookedFlatType = row[8].isEmpty() ? null : FlatType.valueOf(row[8].toUpperCase());
 
-            // Lookup Applicant (essential)
             Optional<User> applicantOpt = Database.getUsersRepository().findUserByNric(applicantNric);
-            Optional<Project> projectOpt = Database.getProjectsRepository().findById(projectName);
-            Optional<User> lastModByOpt = Database.getUsersRepository().findUserByNric(lastModByNric);
-
-            if (!applicantOpt.isPresent() || !projectOpt.isPresent() || !lastModByOpt.isPresent()) {
-                if (!applicantOpt.isPresent()) {
-                    System.err.println("Applicant not found for NRIC: " + applicantNric);
-                }
-                if (!projectOpt.isPresent()) {
-                    System.err.println("Project not found for project name: " + projectName);
-                }
-                if (!lastModByOpt.isPresent()) {
-                    System.err.println("Last modifier not found for NRIC: " + lastModByNric);
-                }
+            if (applicantOpt.isEmpty()) {
+                System.err.println("Skipping application row [" + docId + "]: Applicant NRIC '" + applicantNric + "' not found.");
                 return null;
-            } else {
-                User applicant = applicantOpt.get();
-                Project project = projectOpt.get();
-                User lastModBy = lastModByOpt.get();
-                
-                ProjectApplication app = new ProjectApplication(docId, applicant, project, status, 
-                                              toLocalDateTime(submissionDate), toLocalDateTime(lastModDate), 
-                                              lastModBy, rejectionReason);
-                return app;
             }
+            // We might only have the NRIC for lastModifiedBy, not the User object yet
+            // Pass null for lastModifiedBy User object, but pass the NRIC string
+            ProjectApplication app = new ProjectApplication(
+                 docId,
+                 applicantOpt.get(), // applicant User object
+                 projectName,        // projectName String
+                 status,
+                 submissionDate,     // LocalDateTime or null
+                 lastModDate,        // LocalDateTime or null
+                 null,               // Pass null for lastModifiedBy User object initially
+                 lastModByNric,      // Pass the NRIC string
+                 rejectionReason,
+                 bookedFlatType      // Pass loaded value
+             );
+
+            return app;
 
         } catch (Exception e) {
             System.err.println("Error mapping row to ProjectApplication: " + String.join(",", row) + " | Error: " + e.getMessage());
@@ -95,16 +93,18 @@ public class ApplicationRepository implements IRepository<ProjectApplication, St
         }
     }
 
-     private String[] mapApplicationToRow(ProjectApplication app) {
+    private String[] mapApplicationToRow(ProjectApplication app) {
         return new String[]{
                 app.getDocumentID(),
                 app.getSubmitter() != null ? app.getSubmitter().getNric() : "",
                 app.getProjectName() != null ? app.getProjectName() : "",
                 app.getStatus() != null ? app.getStatus().name() : "",
-                app.getSubmissionDate() != null ? formatDate(app.getSubmissionDate()) : "", // Add getter if missing
-                app.getLastModifiedDate() != null ? formatDate(app.getLastModifiedDate()) : "", // Add getter if missing
-                app.getLastModifiedBy() != null ? app.getLastModifiedBy().getNric() : "", // Add getter/field if missing
-                app.getRejectionReason() != null ? app.getRejectionReason() : ""
+                formatDate(app.getSubmissionDate()),
+                formatDate(app.getLastModifiedDate()),
+                app.getLastModifiedByNric() != null ? app.getLastModifiedByNric() : "",
+                app.getRejectionReason() != null ? app.getRejectionReason() : "",
+                // Add booked flat type (handle null)
+                app.getBookedFlatType() != null ? app.getBookedFlatType().name() : ""
         };
     }
 
@@ -192,19 +192,23 @@ public class ApplicationRepository implements IRepository<ProjectApplication, St
         return new ArrayList<>(); // Placeholder
     }
 
-    private String formatDate(LocalDateTime ldt) {
-        if (ldt == null) return "";
-        Instant instant = ldt.atZone(ZoneId.systemDefault()).toInstant(); // Or ZoneId.of("UTC")
-        return DATE_FORMAT.format(Date.from(instant));
-    }
-
-    private Date parseDate(String dateString) throws ParseException {
-        if (dateString == null || dateString.isEmpty()) return null;
-        return DATE_FORMAT.parse(dateString);
-    }
-
-     private LocalDateTime toLocalDateTime(Date date) {
-        if (date == null) return null;
-        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(); // Or ZoneId.of("UTC")
-    }
+private String formatDate(LocalDateTime ldt) {
+         if (ldt == null) return "";
+         // Using ISO format which SimpleDateFormat can also parse/format if needed
+         // Or use DateTimeFormatter
+         return ldt.format(java.time.format.DateTimeFormatter.ISO_DATE_TIME);
+     }
+     private Date parseDate(String dateString) throws ParseException {
+         // Keep using SimpleDateFormat for consistency with other repos, parse ISO format
+          if (dateString == null || dateString.isEmpty()) return null;
+          // Adjust SimpleDateFormat to parse ISO format saved by formatDate
+          SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+          // May need to handle timezone or variations if saved differently
+          return isoFormat.parse(dateString);
+     }
+      private LocalDateTime toLocalDateTime(Date date) {
+         if (date == null) return null;
+         // Convert java.util.Date to LocalDateTime via Instant
+         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+     }
 }

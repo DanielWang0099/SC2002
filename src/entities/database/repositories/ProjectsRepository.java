@@ -180,14 +180,17 @@ public class ProjectsRepository implements IRepository<Project, String> {
         projectMap.put(project.getName(), project);
         return project;
     }
+    
     @Override
     public Optional<Project> findById(String projectName) { /* unchanged */
          if (projectName == null) return Optional.empty();
         return Optional.ofNullable(projectMap.get(projectName));
     }
     public Optional<Project> findByName(String projectName) { /* unchanged */ return findById(projectName); }
+
     @Override
     public List<Project> findAll() { /* unchanged */ return new ArrayList<>(projectMap.values()); }
+
      @Override
     public boolean deleteById(String projectName) { /* unchanged */
          if (projectName == null) return false;

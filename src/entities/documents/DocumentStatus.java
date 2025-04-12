@@ -8,5 +8,6 @@ public enum DocumentStatus {
     REJECTED,
     WITHDRAWN,   // If applicable
     REPLIED,     // For enquiries
-    CLOSED       // Final state
+    CLOSED,       // Final state
+    BOOKED
 }
