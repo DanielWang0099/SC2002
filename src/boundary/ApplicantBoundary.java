@@ -159,31 +159,38 @@ public class ApplicantBoundary extends BaseBoundary {
          displayEnquiriesList(enquiries, true); // Show details for own enquiries
      }
 
-     private void handleEditMyEnquiry() {
-         System.out.println("Your editable enquiries (DRAFT or SUBMITTED):");
-         List<Enquiry> enquiries = mainController.getApplicantController().viewMyEnquiries(currentApplicant()).stream()
-                .filter(e -> e.getStatus() == DocumentStatus.DRAFT || e.getStatus() == DocumentStatus.SUBMITTED)
-                .collect(Collectors.toList());
+    private void handleEditMyEnquiry() {
+        System.out.println("Your editable enquiries (Not REPLIED or CLOSED):"); // Updated description
+        // Filter for enquiries that are NOT REPLIED and NOT CLOSED
+        List<Enquiry> enquiries = mainController.getApplicantController().viewMyEnquiries(currentApplicant()).stream()
+               .filter(e -> e.getStatus() != DocumentStatus.REPLIED && e.getStatus() != DocumentStatus.CLOSED)
+               .collect(Collectors.toList());
 
-        if (!displayEnquiriesList(enquiries, true)) {
-            System.out.println("You have no enquiries that can be edited.");
-            return;
+       if (!displayEnquiriesList(enquiries, true)) {
+           System.out.println("You have no enquiries that can currently be edited.");
+           return;
+       }
+
+        String enquiryId = getStringInput("Enter the Enquiry ID to edit (or type 'cancel'): ");
+        if (enquiryId.equalsIgnoreCase("cancel")) return;
+
+        // Verify the selected ID is actually in the editable list shown
+        if (enquiries.stream().noneMatch(e -> e.getDocumentID().equals(enquiryId))) {
+             System.out.println("Invalid Enquiry ID selected from the editable list.");
+             return;
         }
 
-         String enquiryId = getStringInput("Enter the Enquiry ID to edit (or type 'cancel'): ");
-         if (enquiryId.equalsIgnoreCase("cancel")) return;
 
-         String newContent = getStringInput("Enter the new enquiry content: ");
+        String newContent = getStringInput("Enter the new enquiry content: ");
 
-         boolean success = mainController.getApplicantController().editEnquiry(currentApplicant(), enquiryId, newContent);
-         if(success) {
-             System.out.println("Enquiry updated successfully.");
-         } else {
-             System.out.println("Failed to update enquiry.");
-             // Error message from controller
-         }
-     }
-
+        boolean success = mainController.getApplicantController().editEnquiry(currentApplicant(), enquiryId, newContent);
+        // Success/failure messages are now primarily handled within the controller/model edit methods.
+        if(success) {
+            // System.out.println("Enquiry update attempt finished."); // Optional confirmation
+        } else {
+            // System.out.println("Failed to update enquiry.");
+        }
+    }
 
     private void handleDeleteMyEnquiry() {
          System.out.println("Your deletable enquiries (DRAFT or SUBMITTED):");

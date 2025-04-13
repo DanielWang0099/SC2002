@@ -75,9 +75,9 @@ public class ProjectsRepository implements IRepository<Project, String> {
             }
              // Parse Flat Type 2 block (optional)
              if (row.length > 7 && !row[5].isEmpty()) {
-                 FlatType type2 = FlatType.valueOf(row[6].toUpperCase());
-                 int count2 = Integer.parseInt(row[7]);
-                 double price2 = Double.parseDouble(row[8]);
+                 FlatType type2 = FlatType.valueOf(row[5].toUpperCase());
+                 int count2 = Integer.parseInt(row[6]);
+                 double price2 = Double.parseDouble(row[7]);
                   if (initialUnits.containsKey(type2)) {
                       System.err.println("Warning: Duplicate flat type " + type2 + " defined for project " + name + ". Ignoring second entry.");
                   } else {
@@ -86,10 +86,10 @@ public class ProjectsRepository implements IRepository<Project, String> {
                   }
              }
 
-            Date openDate = DATE_FORMAT.parse(row[row.length - 12]); // Adjust indices based on final column count
-            Date closeDate = DATE_FORMAT.parse(row[row.length - 11]);
-            String managerNric = row[row.length - 10];
-            boolean visibility = Boolean.parseBoolean(row[row.length - 9]);
+            Date openDate = DATE_FORMAT.parse(row[8]); // Adjust indices based on final column count
+            Date closeDate = DATE_FORMAT.parse(row[9]);
+            String managerNric = row[10];
+            boolean visibility = Boolean.parseBoolean(row[11]);
 
             // Find Manager - Requires UsersRepository to be available!
             Optional<User> managerOpt = Database.getUsersRepository().findUserByNric(managerNric);

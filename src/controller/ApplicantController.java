@@ -168,7 +168,27 @@ public class ApplicantController {
         }
         Enquiry enquiry = enquiryOpt.get();
 
-        // Authorisation & Status Check
+        boolean edited = enquiry.edit(applicant, newContent);
+
+    // 4. If edit was successful in the model, save the changes via repository
+        if (edited) {
+            try {
+                Database.getDocumentsRepository().saveDocument(enquiry); // Persist changes
+                System.out.println("Enquiry " + enquiryId + " edit saved successfully.");
+                return true;
+            } catch (Exception e) {
+                System.err.println("Error saving edited enquiry " + enquiryId + ": " + e.getMessage());
+                // Consider rolling back the change in the model object if save fails? Complex.
+                return false;
+            }
+        } else {
+            // Error message (e.g., wrong status, auth failure, invalid content) printed by Enquiry.edit()
+            System.err.println("Enquiry Edit Error: Failed to apply edits for enquiry " + enquiryId + " (check previous errors).");
+            return false;
+        }
+    }
+
+        /* // Authorisation & Status Check
         if (!enquiry.getSubmitter().equals(applicant)) {
              System.err.println("Enquiry Edit Error: Applicant " + applicant.getNric() + " did not submit this enquiry.");
             return false;
@@ -193,7 +213,7 @@ public class ApplicantController {
              System.err.println("Enquiry Edit Error: Failed to apply edits for enquiry " + enquiryId);
              return false;
         }
-    }
+    } */
 
      public boolean deleteEnquiry(Applicant applicant, String enquiryId) {
          Optional<Enquiry> enquiryOpt = Database.getDocumentsRepository().getEnquiryRepository().findById(enquiryId);

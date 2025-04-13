@@ -315,22 +315,34 @@ public class HdbOfficerBoundary extends BaseBoundary {
      }
 
      private void handleEditMyEnquiryAsApplicant() {
-          System.out.println("Your editable enquiries (DRAFT or SUBMITTED):");
-         List<Enquiry> enquiries = mainController.getHdbOfficerController().viewMySubmittedEnquiries(currentOfficer()).stream()
-                .filter(e -> e.getStatus() == DocumentStatus.DRAFT || e.getStatus() == DocumentStatus.SUBMITTED)
-                .collect(Collectors.toList());
+        System.out.println("Your editable enquiries submitted as Applicant (Not REPLIED or CLOSED):"); // Updated description
+        // Filter for enquiries that are NOT REPLIED and NOT CLOSED
+       List<Enquiry> enquiries = mainController.getHdbOfficerController().viewMySubmittedEnquiries(currentOfficer()).stream()
+              .filter(e -> e.getStatus() != DocumentStatus.REPLIED && e.getStatus() != DocumentStatus.CLOSED)
+              .collect(Collectors.toList());
 
-        if (!displayEnquiriesList(enquiries, true)) {
-            System.out.println("You have no enquiries that can be edited.");
+      if (!displayEnquiriesList(enquiries, true)) {
+          System.out.println("You have no submitted enquiries that can currently be edited.");
+          return;
+      }
+       String enquiryId = getStringInput("Enter the Enquiry ID to edit (or 'cancel'): ");
+        if (enquiryId.equalsIgnoreCase("cancel")) return;
+
+        // Verify the selected ID is actually in the editable list shown
+       if (enquiries.stream().noneMatch(e -> e.getDocumentID().equals(enquiryId))) {
+            System.out.println("Invalid Enquiry ID selected from the editable list.");
             return;
-        }
-         String enquiryId = getStringInput("Enter the Enquiry ID to edit (or 'cancel'): ");
-          if (enquiryId.equalsIgnoreCase("cancel")) return;
-         String newContent = getStringInput("Enter the new enquiry content: ");
-         boolean success = mainController.getHdbOfficerController().editEnquiryAsApplicant(currentOfficer(), enquiryId, newContent);
-          if(success) System.out.println("Enquiry updated."); else System.out.println("Failed to update enquiry.");
-     }
+       }
 
+       String newContent = getStringInput("Enter the new enquiry content: ");
+
+       boolean success = mainController.getHdbOfficerController().editEnquiryAsApplicant(currentOfficer(), enquiryId, newContent);
+        if(success) {
+           // System.out.println("Enquiry update attempt finished.");
+       } else {
+           // System.out.println("Failed to update enquiry.");
+       }
+   }
       private void handleDeleteMyEnquiryAsApplicant() {
            System.out.println("Your deletable enquiries (DRAFT or SUBMITTED):");
          List<Enquiry> enquiries = mainController.getHdbOfficerController().viewMySubmittedEnquiries(currentOfficer()).stream()
