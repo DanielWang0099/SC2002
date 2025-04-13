@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import entities.project.*;
 import entities.user.*;
 import java.util.Date;
@@ -182,6 +184,7 @@ public class ProjectsRepository implements IRepository<Project, String> {
          if (projectName == null) return Optional.empty();
         return Optional.ofNullable(projectMap.get(projectName));
     }
+
     public Optional<Project> findByName(String projectName) { /* unchanged */ return findById(projectName); }
 
     @Override
@@ -202,34 +205,84 @@ public class ProjectsRepository implements IRepository<Project, String> {
 
 
     // --- Requirement Specific Finders (Implementations) ---
-    public List<Project> findByManager(HdbManager manager) { /* unchanged */
-        if (manager == null) return new ArrayList<>();
-        return projectMap.values().stream()
-                         .filter(project -> manager.equals(project.getManager()))
-                         .collect(Collectors.toList());
-    }
+
     public List<Project> findVisibleToApplicants() { /* unchanged */
         return projectMap.values().stream()
                          .filter(Project::isVisible)
                          .collect(Collectors.toList());
     }
 
-    public List<Project> findByFilterCriteria(String neighborhood, FlatType flatType) { /* unchanged */
-        System.out.println("ProjectsRepository: Filtering projects (Neighborhood: " + neighborhood + ", FlatType: " + flatType + ")");
-         return projectMap.values().stream()
-                 .filter(project -> (neighborhood == null || neighborhood.trim().isEmpty() || project.getNeighbourhood().equalsIgnoreCase(neighborhood.trim())))
-                 .filter(project -> (flatType == null || project.getInitialUnitCount(flatType) > 0))
-                 .collect(Collectors.toList());
+     public List<Project> findByCriteria(String neighborhoodFilter, FlatType flatTypeFilter,
+            String managerNricFilter, // Changed from HdbManager object to NRIC String
+            Boolean visibilityFilter,
+            Date[] dateRangeFilter) { // Added Date range filter
+
+        Stream<Project> projectStream = projectMap.values().stream();
+
+        // Apply neighborhood filter
+        if (neighborhoodFilter != null && !neighborhoodFilter.trim().isEmpty()) {
+        final String finalNeighFilter = neighborhoodFilter.trim(); // For use in lambda
+        projectStream = projectStream.filter(project -> project.getNeighbourhood()
+                                        .equalsIgnoreCase(finalNeighFilter));
+        }
+
+        // Apply flat type filter
+        if (flatTypeFilter != null) {
+        projectStream = projectStream.filter(project -> project.getInitialUnitCount(flatTypeFilter) > 0);
+        }
+
+        // Apply manager filter (using NRIC)
+        if (managerNricFilter != null && !managerNricFilter.trim().isEmpty()) {
+        final String finalManagerNric = managerNricFilter.trim(); // For use in lambda
+        projectStream = projectStream.filter(project -> project.getManager() != null &&
+                            project.getManager().getNric().equalsIgnoreCase(finalManagerNric));
+        }
+
+        // Apply visibility filter
+        if (visibilityFilter != null) {
+        projectStream = projectStream.filter(project -> project.isVisible() == visibilityFilter);
+        }
+
+        if (dateRangeFilter != null && dateRangeFilter.length == 2 &&
+            dateRangeFilter[0] != null && dateRangeFilter[1] != null &&
+            !dateRangeFilter[0].after(dateRangeFilter[1])) { // Check for valid range
+                final Date filterStart = dateRangeFilter[0];
+                final Date filterEnd = dateRangeFilter[1];
+                projectStream = projectStream.filter(project ->
+                    project.getApplicationOpenDate() != null && project.getApplicationCloseDate() != null &&
+                    !project.getApplicationOpenDate().after(filterEnd) && // Project starts before or when filter ends
+                    !project.getApplicationCloseDate().before(filterStart) // Project ends after or when filter starts
+                );
+        }
+
+
+        // Return sorted list
+        return projectStream
+                .sorted(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER))
+                .collect(Collectors.toList());
     }
 
-    public List<Project> findProjectsInApplicationPeriod(Date startDate, Date endDate) { /* unchanged */
-         System.out.println("ProjectsRepository: Finding projects overlapping period " + startDate + " - " + endDate + " (Requires careful Date comparison)");
-         if (startDate == null || endDate == null || startDate.after(endDate)) {
-             return new ArrayList<>(); // Invalid date range
+
+        // Return sorted list
+        public List<Project> findByManagerNric(String managerNric) {
+            return findByCriteria(null, null, managerNric, null, null);
+        }
+    
+        // findProjectsInApplicationPeriod can also use findByCriteria
+        public List<Project> findProjectsInApplicationPeriod(Date startDate, Date endDate) {
+            if (startDate == null || endDate == null) return new ArrayList<>();
+            return findByCriteria(null, null, null, null, new Date[]{startDate, endDate});
          }
-         return projectMap.values().stream()
-                 .filter(project -> project.getApplicationOpenDate() != null && project.getApplicationCloseDate() != null)
-                 .filter(project -> !project.getApplicationOpenDate().after(endDate) && !project.getApplicationCloseDate().before(startDate))
-                 .collect(Collectors.toList());
-     }
+
+         public List<Project> findByVisibility(Date startDate, Date endDate) {
+            if (startDate == null || endDate == null) return new ArrayList<>();
+            return findByCriteria(null, null, null, null, new Date[]{startDate, endDate});
+         }
+
+         public List<Project> findByManager(HdbManager manager) { /* unchanged */
+            if (manager == null) return new ArrayList<>();
+            return projectMap.values().stream()
+                             .filter(project -> manager.equals(project.getManager()))
+                             .collect(Collectors.toList());
+        }
 }

@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.*;
 import java.util.Comparator;
 
@@ -317,5 +316,43 @@ public class ProjectController {
          return project.getAssignedOfficers().stream()
                        .anyMatch(officer -> officer.getNric().equalsIgnoreCase(officerNric));
      }
+     public List<Project> getFilteredProjects(User requestingUser, String neighborhood, FlatType flatType,
+                                             String managerNric, Date[] dateRange) { // Added filters
 
+        Boolean visibilityFilter = null; // Managers & Officers (initially) see all visibility
+        HdbManager managerFilter = null; // Specific manager object if needed for filtering handled projects
+
+        if (requestingUser != null && requestingUser.getRole() == Role.HDB_MANAGER) {
+            // If manager is filtering by "my projects", set managerNric filter
+            // We handle the "my projects" view via getProjectsByManager instead for clarity.
+        } else if (requestingUser == null || requestingUser.getRole() == Role.APPLICANT) {
+            visibilityFilter = true; // Applicants only see visible=true projects
+        }
+        // Officers handled below
+
+        // Call repository finder with all applicable filters
+        List<Project> filteredProjects = Database.getProjectsRepository()
+                .findByCriteria(neighborhood, flatType, managerNric, visibilityFilter, dateRange);
+
+        // Apply Officer specific visibility logic AFTER basic filtering
+        if (requestingUser != null && requestingUser.getRole() == Role.HDB_OFFICER) {
+             final String officerNric = requestingUser.getNric();
+             // Re-fetch ALL matching filters first, then apply visibility logic for officers
+             List<Project> allMatching = Database.getProjectsRepository()
+                     .findByCriteria(neighborhood, flatType, managerNric, null, dateRange); // Visibility null
+             return allMatching.stream()
+                        .filter(p -> p.isVisible() || isOfficerAssigned(p, officerNric)) // Visible OR Handled by officer
+                        .sorted(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER))
+                        .collect(Collectors.toList());
+        }
+
+        return filteredProjects; // Already sorted by repository for Applicant/Manager/null
+    }
+
+    public List<Project> getProjectsByManager(HdbManager manager, String neighborhood, FlatType flatType, Date[] dateRange) {
+        if (manager == null) return List.of();
+        // Use the repository method with the manager NRIC filter applied
+        return Database.getProjectsRepository()
+                       .findByCriteria(neighborhood, flatType, manager.getNric(), null, dateRange); // Visibility null = manager sees all their projects
+   }
 }

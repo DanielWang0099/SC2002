@@ -167,7 +167,7 @@ public class HdbOfficerBoundary extends BaseBoundary {
                  chosenType = FlatType.valueOf(typeStr.toUpperCase());
                  if (!availableTypes.contains(chosenType)) {
                      System.out.println("Invalid or unavailable flat type selected. Please choose from the list.");
-                     chosenType = null; // Re-prompt
+                     chosenType = null;
                  }
             } catch (IllegalArgumentException e) {
                  System.out.println("Invalid flat type entered. Please use TWO_ROOM or THREE_ROOM.");
@@ -238,9 +238,22 @@ public class HdbOfficerBoundary extends BaseBoundary {
     // --- Applicant Function Handlers (Delegation) ---
 
     private void handleViewAvailableProjectsAsApplicant() {
-        System.out.println("Fetching available projects (Applicant View)...");
-        // Use the specific method in HdbOfficerController for potentially wider view
-        List<Project> projects = mainController.getHdbOfficerController().getAvailableProjectsForViewing(currentOfficer());
+        System.out.println("--- View Available BTO Projects (Officer's View) ---");
+         // Get Filters
+        FlatType flatTypeFilter = promptForFlatTypeFilter(); // Add this helper method
+        String neighFilter = promptForNeighbourhoodFilter(); // Add this helper method
+        // Officers viewing general list likely don't filter by manager or date range either
+        // String managerNricFilter = null;
+        // Date[] dateRangeFilter = null;
+
+        System.out.println("Fetching available projects" +
+                           (flatTypeFilter != null ? " offering " + flatTypeFilter : "") +
+                           (neighFilter != null ? " in " + neighFilter : "") + "...");
+
+        // Call controller with filters - pass null for manager/date
+        List<Project> projects = mainController.getProjectController()
+            .getFilteredProjects(currentOfficer(), neighFilter, flatTypeFilter, null, null); // Pass nulls
+
         displayProjectsList(projects, false); // Use standard applicant view format
     }
 

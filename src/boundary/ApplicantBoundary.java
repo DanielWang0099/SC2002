@@ -81,27 +81,45 @@ public class ApplicantBoundary extends BaseBoundary {
     // --- Action Handlers ---
 
     private void handleViewAvailableProjects() {
-        System.out.println("Fetching available projects...");
-        List<Project> projects = mainController.getApplicantController().getAvailableProjects(currentApplicant());
+        System.out.println("--- View Available BTO Projects ---");
+        // Get Filters
+        FlatType flatTypeFilter = promptForFlatTypeFilter();
+        String neighFilter = promptForNeighbourhoodFilter();
+        // Applicants don't usually filter by Manager NRIC or Date Range for available projects
+
+        System.out.println("Fetching available projects" +
+                           (flatTypeFilter != null ? " offering " + flatTypeFilter : "") +
+                           (neighFilter != null ? " in " + neighFilter : "") + "...");
+
+        // Call controller with filters - pass null for manager/date filters
+        List<Project> projects = mainController.getProjectController()
+                                    .getFilteredProjects(currentApplicant(), neighFilter, flatTypeFilter, null, null); // Pass nulls
+
         displayProjectsList(projects);
     }
 
     private void handleApplyForProject() {
-         System.out.println("Available Projects:");
-         List<Project> projects = mainController.getApplicantController().getAvailableProjects(currentApplicant());
-         if (!displayProjectsList(projects)) return; // No projects to apply for
+        System.out.println("--- Apply for Project ---");
+        System.out.println("Available Projects (Apply Filters Optional):");
+        FlatType flatTypeFilter = promptForFlatTypeFilter();
+        String neighFilter = promptForNeighbourhoodFilter();
 
-         String projectName = getStringInput("Enter the Project Name to apply for (or type 'cancel'): ");
-         if (projectName.equalsIgnoreCase("cancel")) return;
+        List<Project> projects = mainController.getProjectController()
+                                    .getFilteredProjects(currentApplicant(), neighFilter, flatTypeFilter, null, null); // Pass nulls
 
-         ProjectApplication application = mainController.getApplicantController().applyForProject(currentApplicant(), projectName);
-         if (application != null) {
-             System.out.println("Successfully submitted application for '" + projectName + "'.");
-             System.out.println("Your Application ID: " + application.getDocumentID());
-         } else {
-             System.out.println("Failed to submit application for '" + projectName + "'. Please check eligibility and project status.");
-             // Specific error printed by controller
-         }
+        if (!displayProjectsList(projects)) return;
+
+        String projectName = getStringInput("Enter the Project Name to apply for (or type 'cancel'): ");
+        if (projectName.equalsIgnoreCase("cancel")) return;
+
+        ProjectApplication application = mainController.getApplicantController().applyForProject(currentApplicant(), projectName);
+        if (application != null) {
+            System.out.println("Successfully submitted application for '" + projectName + "'.");
+            System.out.println("Your Application ID: " + application.getDocumentID());
+        } else {
+            System.out.println("Failed to submit application for '" + projectName + "'. Please check eligibility and project status.");
+            // Specific error printed by controller
+        }
     }
 
      private void handleViewMyApplications() {

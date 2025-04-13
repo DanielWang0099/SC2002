@@ -317,16 +317,37 @@ public class HdbManagerBoundary extends BaseBoundary {
     }
 
     private void handleViewAllProjects() {
-        System.out.println("Fetching all projects...");
-        List<Project> projects = mainController.getHdbManagerController().viewAllProjects(currentManager());
+        System.out.println("--- View All Projects ---");
+        // Get Filters
+        FlatType flatTypeFilter = promptForFlatTypeFilter();
+        String neighFilter = promptForNeighbourhoodFilter();
+        String managerNricFilter = promptForManagerNricFilter(); // Ask manager filter
+        Date[] dateRangeFilter = promptForDateRangeFilter();   // Ask date range filter
+
+        System.out.println("Fetching all projects (applying filters)...");
+
+        // Call controller with all filters
+        List<Project> projects = mainController.getProjectController()
+            .getFilteredProjects(currentManager(), neighFilter, flatTypeFilter, managerNricFilter, dateRangeFilter);
+
         displayProjectsList(projects, true); // Show manager info
     }
 
     private void handleViewMyProjects() {
-         System.out.println("Fetching projects you manage...");
-        List<Project> projects = mainController.getHdbManagerController().viewMyProjects(currentManager());
-        displayProjectsList(projects, true); // Show manager info
-    }
+        System.out.println("--- View My Managed Projects ---");
+        // Get Filters (Manager filter is implicit)
+        FlatType flatTypeFilter = promptForFlatTypeFilter();
+        String neighFilter = promptForNeighbourhoodFilter();
+        Date[] dateRangeFilter = promptForDateRangeFilter();
+
+        System.out.println("Fetching projects you manage (applying filters)...");
+
+        // Call controller with filters (Manager object passed for implicit filtering)
+       List<Project> projects = mainController.getProjectController()
+           .getProjectsByManager(currentManager(), neighFilter, flatTypeFilter, dateRangeFilter);
+
+       displayProjectsList(projects, true); // Show manager info
+   }
 
     private void handleViewPendingOfficerRegs() {
         System.out.println("Fetching pending officer registrations for your projects...");
@@ -636,4 +657,26 @@ public class HdbManagerBoundary extends BaseBoundary {
         return true;
      }
 
+     private String promptForManagerNricFilter() { // New helper
+        System.out.print("Filter by Manager NRIC? (Enter NRIC or leave blank for ALL): ");
+        String input = scanner.nextLine().trim();
+         // Optional: Add NRIC format validation here if desired
+        return input.isEmpty() ? null : input;
+    }
+    private Date[] promptForDateRangeFilter() { // New helper
+        System.out.println("Filter by Application Date Range?");
+        Date startDate = getDateInput("Enter Start Date (yyyy-MM-dd or leave blank/cancel for none): ");
+        if (startDate == null) return null; // No range filter if start date not provided
+
+        Date endDate = null;
+        while (endDate == null) {
+             endDate = getDateInput("Enter End Date (yyyy-MM-dd or 'cancel'): ");
+             if (endDate == null) return null; // No range filter if end date cancelled
+             if (startDate.after(endDate)) {
+                 System.out.println("End date cannot be before start date. Please re-enter.");
+                 endDate = null; // Force re-entry of end date
+             }
+        }
+        return new Date[]{startDate, endDate};
+    }
 }
