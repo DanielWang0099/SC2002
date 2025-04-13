@@ -30,11 +30,9 @@ public class RegistrationRepository implements IRepository<ProjectRegistration, 
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); }
     // Package-private constructor
 
-    public RegistrationRepository() {
-        loadFromFile();
-    }
+    public RegistrationRepository() {}
 
-    private void loadFromFile() {
+    public void loadFromFile() {
         List<ProjectRegistration> loaded = CsvUtil.readCsv(filename, this::mapRowToRegistration, true);
         loaded.forEach(reg -> registrationMap.putIfAbsent(reg.getDocumentID(), reg));
         System.out.println("Loaded " + registrationMap.size() + " registrations from " + filename);

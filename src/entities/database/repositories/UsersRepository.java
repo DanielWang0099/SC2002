@@ -15,7 +15,7 @@ public class UsersRepository {
     private final HdbManagerRepository hdbManagerRepository;
 
     // Package-private constructor, managed by Database facade
-    public UsersRepository() {
+/*     public UsersRepository() {
         System.out.println("Initializing UsersRepository Facade...");
         this.applicantRepository = new ApplicantRepository(); // Constructor now calls loadFromFile()
         this.hdbOfficerRepository = new HdbOfficerRepository(); // Constructor now calls loadFromFile()
@@ -25,7 +25,17 @@ public class UsersRepository {
         System.out.println("Counts: Applicants=" + applicantRepository.count() +
                            ", Officers=" + hdbOfficerRepository.count() +
                            ", Managers=" + hdbManagerRepository.count());
+    } */
+
+    public UsersRepository() {
+        System.out.println("Initializing UsersRepository Facade instances...");
+        this.applicantRepository = new ApplicantRepository();
+        this.hdbOfficerRepository = new HdbOfficerRepository();
+        this.hdbManagerRepository = new HdbManagerRepository();
+        // DO NOT call loading here
+        System.out.println("UsersRepository Facade instances created.");
     }
+
     /**
      * Loads user data from a specified file (CSV assumed).
      * !! ASSUMED FORMAT: Name,NRIC,Password,Role,Age,MaritalStatus !!

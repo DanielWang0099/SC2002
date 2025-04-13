@@ -26,14 +26,10 @@ public class ProjectsRepository implements IRepository<Project, String> {
     // Define a consistent date format for CSV read/write
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    public ProjectsRepository() {
-        System.out.println("Initializing ProjectsRepository...");
-        loadFromFile();
-        System.out.println("ProjectsRepository initialized with " + projectMap.size() + " projects.");
-    }
+    public ProjectsRepository() {}
 
      // --- Load and Save Methods ---
-    private void loadFromFile() {
+     public void loadFromFile() {
         // IMPORTANT: Requires Database.getUsersRepository() to be ready for lookups!
         // Ensure correct initialization order in Database facade if lookups needed during load.
         List<Project> loadedProjects = CsvUtil.readCsv(filename, this::mapRowToProject, true); // skipHeader=true

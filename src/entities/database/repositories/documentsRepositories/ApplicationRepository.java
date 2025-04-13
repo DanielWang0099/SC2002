@@ -30,11 +30,9 @@ public class ApplicationRepository implements IRepository<ProjectApplication, St
 
 
     // Package-private constructor
-    public ApplicationRepository() {
-        loadFromFile();
-    }
+    public ApplicationRepository() {}
 
-    private void loadFromFile() {
+    public void loadFromFile() {
         // Note: Assumes Users and Projects Repositories are already loaded for lookups!
         List<ProjectApplication> loaded = CsvUtil.readCsv(filename, this::mapRowToApplication, true);
         loaded.forEach(this::save); // Populate map via save method

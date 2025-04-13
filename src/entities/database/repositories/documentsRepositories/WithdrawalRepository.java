@@ -29,11 +29,9 @@ public class WithdrawalRepository implements IRepository<Withdrawal, String> {
      static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); }
 
      // Package-private constructor
-    public WithdrawalRepository() {
-        loadFromFile();
-    }
+    public WithdrawalRepository() {}
 
-    private void loadFromFile() {
+    public void loadFromFile() {
         // Important: Load AFTER Applications are loaded
         List<Withdrawal> loaded = CsvUtil.readCsv(filename, this::mapRowToWithdrawal, true);
         loaded.forEach(w -> withdrawalMap.putIfAbsent(w.getDocumentID(), w));

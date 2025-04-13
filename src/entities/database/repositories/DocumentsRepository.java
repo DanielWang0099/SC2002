@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import entities.database.repositories.documentsRepositories.*;
+import entities.database.repositories.usersRepositories.ApplicantRepository;
+import entities.database.repositories.usersRepositories.HdbManagerRepository;
+import entities.database.repositories.usersRepositories.HdbOfficerRepository;
 import entities.documents.approvableDocuments.*;
 import entities.documents.*;
 import entities.documents.repliableDocuments.*;
@@ -21,7 +24,7 @@ public class DocumentsRepository { // Not implementing IRepository<IBaseSubmitta
     private final EnquiryRepository enquiryRepository;
 
     // Package-private constructor, managed by Database facade
-    public DocumentsRepository() {
+/*     public DocumentsRepository() {
         System.out.println("Initializing DocumentsRepository Facade...");
         this.applicationRepository = new ApplicationRepository();
         this.registrationRepository = new RegistrationRepository();
@@ -29,6 +32,15 @@ public class DocumentsRepository { // Not implementing IRepository<IBaseSubmitta
         this.enquiryRepository = new EnquiryRepository();
         loadInitialDocuments(); // If applicable
         System.out.println("DocumentsRepository Facade initialized.");
+    } */
+    public DocumentsRepository() {
+        System.out.println("Initializing DocumentsRepository Facade instances...");
+        this.applicationRepository = new ApplicationRepository();
+        this.registrationRepository = new RegistrationRepository();
+        this.withdrawalRepository = new WithdrawalRepository();
+        this.enquiryRepository = new EnquiryRepository();
+        // DO NOT call loading here
+        System.out.println("DocumentsRepository Facade instances created.");
     }
 
     private void loadInitialDocuments() {
