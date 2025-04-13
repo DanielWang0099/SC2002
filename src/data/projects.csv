@@ -1,2 +1,2 @@
 Name,Neighbourhood,FlatType1,InitialUnits1,Price1,FlatType2,InitialUnits2,Price2,OpenDate,CloseDate,ManagerNRIC,Visibility,OfficerNRIC1,OfficerNRIC2,OfficerNRIC3,OfficerNRIC4,OfficerNRIC5,OfficerNRIC6,OfficerNRIC7,OfficerNRIC8,OfficerNRIC9,OfficerNRIC10
-p1,n1,TWO_ROOM,1,1.0,,,,2025-04-01,2025-04-12,S5678901H,true,,,,,,,,,,
+p1,n1,THREE_ROOM,3,30003.3,TWO_ROOM,3,30000.0,2025-04-12,2025-04-15,S5678901H,true,,,,,,,,,,
