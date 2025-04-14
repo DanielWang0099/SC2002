@@ -29,11 +29,9 @@ public class EnquiryRepository implements IRepository<Enquiry, String> {
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); }
 
     // Package-private constructor
-    public EnquiryRepository() {
-        loadFromFile();
-    }
+    public EnquiryRepository() {}
 
-    private void loadFromFile() {
+    public void loadFromFile() {
         List<Enquiry> loaded = CsvUtil.readCsv(filename, this::mapRowToEnquiry, true);
         loaded.forEach(e -> enquiryMap.putIfAbsent(e.getDocumentID(), e));
         System.out.println("Loaded " + enquiryMap.size() + " enquiries from " + filename);

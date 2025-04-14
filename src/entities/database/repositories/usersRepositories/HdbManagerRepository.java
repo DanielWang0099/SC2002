@@ -16,12 +16,10 @@ public class HdbManagerRepository implements IRepository<HdbManager, String> {
     private final String filename = "data/hdb_managers.csv"; // Define filename
 
     // Package-private constructor
-   public HdbManagerRepository() {
-       loadFromFile(); // Load data on initialization
-   }
+   public HdbManagerRepository() {}
 
    // --- Load and Save Methods ---
-   private void loadFromFile() {
+   public void loadFromFile() {
        List<HdbManager> loadedManagers = CsvUtil.readCsv(filename, this::mapRowToManager, true); // skipHeader=true
        loadedManagers.forEach(this::save); // Use save to populate map correctly
        System.out.println("Loaded " + managerMap.size() + " HDB managers from " + filename);

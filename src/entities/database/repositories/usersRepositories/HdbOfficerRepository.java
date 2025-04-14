@@ -15,12 +15,10 @@ public class HdbOfficerRepository implements IRepository<HdbOfficer, String> {
     private final String filename = "data/hdb_officers.csv"; // Define filename
 
     // Package-private constructor, managed by UsersRepository facade
-    public HdbOfficerRepository() {
-        loadFromFile(); // Load data on initialization
-    }
+    public HdbOfficerRepository() {}
 
     // --- Load and Save Methods ---
-    private void loadFromFile() {
+    public void loadFromFile() {
         List<HdbOfficer> loadedOfficers = CsvUtil.readCsv(filename, this::mapRowToOfficer, true); // skipHeader=true
         loadedOfficers.forEach(this::save); // Use save to populate map correctly
         System.out.println("Loaded " + officerMap.size() + " HDB officers from " + filename);

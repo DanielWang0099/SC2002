@@ -21,12 +21,10 @@ public class ApplicantRepository implements IRepository<Applicant, String> {
     private final String filename = "data/applicants.csv"; // Define filename
 
     // Package-private constructor, managed by UsersRepository facade
-    public ApplicantRepository() {  
-        loadFromFile(); // Load data on initialization
-    }
+    public ApplicantRepository() {}
 
     // --- Load and Save Methods ---
-    private void loadFromFile() {
+    public void loadFromFile() {
         List<Applicant> loadedApplicants = CsvUtil.readCsv(filename, this::mapRowToApplicant, true); // skipHeader=true
         loadedApplicants.forEach(this::save); // Use save to populate map correctly
         System.out.println("Loaded " + applicantMap.size() + " applicants from " + filename);

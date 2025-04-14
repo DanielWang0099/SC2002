@@ -102,16 +102,32 @@ public class Enquiry implements IReplyableDocument {
 
     @Override
     public boolean edit(User editor, Object newContent) {
-         // Applicant can edit their enquiry if it's still in DRAFT
-         if (this.status == DocumentStatus.DRAFT && editor.equals(this.submitter) && newContent instanceof String) {
-             this.enquiryContent = (String) newContent;
-             this.lastModifiedDate = LocalDateTime.now();
-             this.lastModifiedBy = editor;
-              System.out.println("Enquiry " + documentID + " edited by " + editor.getNric());
-             return true;
-         }
-          System.out.println("Editing failed for " + documentID + ". Invalid status ("+this.status+"), editor, or content type.");
-         return false;
+        // Check authorization: Only the original submitter can edit.
+        if (!editor.equals(this.submitter)) {
+            System.err.println("Edit Error: User " + editor.getNric() + " is not the submitter of enquiry " + getDocumentID());
+            return false;
+        }
+    
+        // Check status: Cannot edit if already REPLIED or CLOSED.
+        if (this.status == DocumentStatus.REPLIED || this.status == DocumentStatus.CLOSED) {
+            System.err.println("Edit Error: Enquiry " + getDocumentID() + " cannot be edited because its status is " + this.status);
+            return false;
+        }
+    
+        // Validate new content (assuming it should be a non-blank String)
+        if (!(newContent instanceof String) || ((String) newContent).isBlank()) {
+            System.err.println("Edit Error: New enquiry content must be a non-empty string.");
+            return false;
+        }
+    
+        // Perform the edit
+        this.enquiryContent = (String) newContent; // Requires enquiryContent setter or direct access
+        this.lastModifiedDate = LocalDateTime.now();
+        this.lastModifiedBy = editor;
+    
+        System.out.println("Enquiry " + documentID + " content updated by " + editor.getNric());
+        // NOTE: The status might remain SUBMITTED or PENDING, etc. Editing doesn't change the status here.
+        return true; // Edit was successful
     }
 
     @Override
