@@ -88,7 +88,6 @@ public class Project {
     public int getRemainingUnitCount(FlatType type) { return remainingFlatUnits.getOrDefault(type, 0); }
     public Map<FlatType, Integer> getRemainingFlatUnits() { return new HashMap<>(remainingFlatUnits); }
     public int getAvailableOfficerSlots() { return MAX_OFFICER_SLOTS - assignedOfficerCount; }
-    public List<HdbOfficer> getAssignedOfficers() { return Arrays.stream(officers).filter(Objects::nonNull).collect(Collectors.toList()); }
     public boolean getVisibility() {return visibility; }
     /**
      * Gets the selling price for a specific flat type.
@@ -220,6 +219,13 @@ public class Project {
             assignedOfficerCount, MAX_OFFICER_SLOTS,
             (visibility ? "Visible to Applicants" : "Hidden from Applicants")
         );
+    }
+
+    public List<HdbOfficer> getAssignedOfficers() {
+        // Stream only elements from index 0 up to (but not including) assignedOfficerCount
+        return Arrays.stream(officers, 0, assignedOfficerCount)
+                     .filter(Objects::nonNull) // Still good practice to filter nulls within the valid range
+                     .collect(Collectors.toList());
     }
 
 }
