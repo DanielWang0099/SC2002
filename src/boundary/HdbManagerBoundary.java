@@ -82,7 +82,13 @@ public class HdbManagerBoundary extends BaseBoundary {
              // Reporting
              case 16: handleGenerateReport(); break;
              // General
-             case 17: handleChangePassword(); break;
+             case 17:
+             boolean changed = handleChangePassword(); // Use inherited helper method
+             if (changed){
+                 System.out.println("Password change process completed. For security, please log in again.");
+                 continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+             }
+             break;
              case 18: System.out.println("Logging out..."); continueLoop = false; break;
              default: System.out.println("Invalid choice.");
          }
@@ -309,10 +315,11 @@ public class HdbManagerBoundary extends BaseBoundary {
          boolean currentVisibility = project.isVisible();
          boolean makeVisible = getYesNoInput("Project is currently " + (currentVisibility ? "Visible" : "Hidden") + ". Set visibility to " + (!currentVisibility ? "Visible" : "Hidden") + "?");
 
-         if (makeVisible != currentVisibility) { // Only proceed if toggling
+         if (makeVisible = true) { // Only proceed if toggling
              boolean success = mainController.getHdbManagerController().toggleProjectVisibility(currentManager(), projectName, makeVisible);
              if (success) System.out.println("Visibility updated."); else System.out.println("Failed to update visibility.");
          } else {
+            
               System.out.println("Visibility not changed.");
          }
     }

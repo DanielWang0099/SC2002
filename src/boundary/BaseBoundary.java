@@ -169,7 +169,7 @@ public abstract class BaseBoundary {
     /**
      * Helper method within boundaries to handle the change password interaction.
      */
-    protected void handleChangePassword() {
+    protected boolean handleChangePassword() {
         System.out.println("\n--- Change Password ---");
         String oldPassword = getStringInput("Enter Current Password: ");
         String newPassword1 = getStringInput("Enter New Password: ");
@@ -177,7 +177,7 @@ public abstract class BaseBoundary {
 
         if (!newPassword1.equals(newPassword2)) {
             System.out.println("New passwords do not match. Password change cancelled.");
-            return;
+            return false;
         }
 
         // Call the Authentication Controller via MainController
@@ -185,10 +185,12 @@ public abstract class BaseBoundary {
 
         if (success) {
             System.out.println("Password change successful.");
+            return true;
             // Note: User object in currentUser is updated, data file saved on exit.
         } else {
             System.out.println("Password change failed. Please check current password and try again.");
-            // Specific error messages (e.g., too short, same as old) handled by Controller.
+            // Specific error messages (e.g., too short, same as old) handled by Controller.\
+            return false;
         }
     }
 }

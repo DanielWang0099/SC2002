@@ -67,7 +67,11 @@ public class ApplicantBoundary extends BaseBoundary {
                  handleDeleteMyEnquiry();
                  break;
             case 9:
-                handleChangePassword(); // Use inherited helper method
+                boolean changed = handleChangePassword(); // Use inherited helper method
+                if (changed){
+                    System.out.println("Password change process completed. For security, please log in again.");
+                    continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+                }
                 break;
             case 10:
                 System.out.println("Logging out...");
@@ -109,6 +113,7 @@ public class ApplicantBoundary extends BaseBoundary {
             .getFilteredProjects(currentApplicant(), neighFilter, flatTypeFilter, null, null, // No manager/date filter for applicants
                                  sortBy, sortAsc); // Pass sorting info
 
+        
         displayProjectsList(projects);
     }
 
