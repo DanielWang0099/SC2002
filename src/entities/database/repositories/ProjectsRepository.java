@@ -102,7 +102,7 @@ public class ProjectsRepository implements IRepository<Project, String> {
 
             // Load assigned officers
             for (int i = 0; i < 10; i++) {
-                 int officerColIndex = row.length - 8 + i; // Index for OfficerNRIC[i+1]
+                 int officerColIndex = row.length - 10 + i; // Index for OfficerNRIC[i+1]
                  if (officerColIndex < row.length && !row[officerColIndex].isEmpty()) {
                      String officerNric = row[officerColIndex];
                       Optional<User> officerOpt = Database.getUsersRepository().findUserByNric(officerNric);
@@ -123,45 +123,59 @@ public class ProjectsRepository implements IRepository<Project, String> {
 
 
     private String[] mapProjectToRow(Project project) {
-        String[] row = new String[22]; // Based on header size: 2 + 3 + 3 + 4 + 10
+        // Base array size matches the expected header columns
+        String[] row = new String[22];
 
-        row[0] = project.getName();
-        row[1] = project.getNeighbourhood();
+        // Basic Info
+        row[0] = project.getName() != null ? project.getName() : ""; // Handle potential null name
+        row[1] = project.getNeighbourhood() != null ? project.getNeighbourhood() : ""; // Handle potential null neighbourhood
 
-        // Flat Type 1 - Assuming max 2 types, get them sorted/consistently
+        // Flat Types and Details (Handles 0, 1, or 2 types gracefully)
         List<FlatType> types = new ArrayList<>(project.getInitialFlatUnitCounts().keySet());
-        types.sort(Comparator.comparing(Enum::name)); // Consistent order
+        // Sort ensures consistent order (e.g., TWO_ROOM then THREE_ROOM)
+        types.sort(Comparator.comparing(Enum::name));
 
+        // Type 1 details (indices 2, 3, 4)
         if (types.size() > 0) {
             FlatType type1 = types.get(0);
-            row[2] = type1.name();
-            row[3] = String.valueOf(project.getInitialUnitCount(type1));
-            row[4] = String.valueOf(project.getUnitPrice(type1));
+            row[2] = type1.name(); // Enum name
+            row[3] = String.valueOf(project.getInitialUnitCount(type1)); // Initial count
+            row[4] = String.valueOf(project.getUnitPrice(type1));       // Price
         } else {
+             // No flat types defined (shouldn't happen if constructor validates)
              row[2] = ""; row[3] = ""; row[4] = "";
         }
-        // Flat Type 2
+
+        // Type 2 details (indices 5, 6, 7)
         if (types.size() > 1) {
             FlatType type2 = types.get(1);
-            row[5] = type2.name();
-            row[6] = String.valueOf(project.getInitialUnitCount(type2));
-            row[7] = String.valueOf(project.getUnitPrice(type2));
+            row[5] = type2.name(); // Enum name
+            row[6] = String.valueOf(project.getInitialUnitCount(type2)); // Initial count
+            row[7] = String.valueOf(project.getUnitPrice(type2));       // Price
         } else {
+            // Only one or zero flat types defined
              row[5] = ""; row[6] = ""; row[7] = "";
         }
 
-        row[8] = DATE_FORMAT.format(project.getApplicationOpenDate());
-        row[9] = DATE_FORMAT.format(project.getApplicationCloseDate());
-        row[10] = project.getManager() != null ? project.getManager().getNric() : "";
-        row[11] = String.valueOf(project.isVisible());
+        // Dates (indices 8, 9) - CORRECTED with null checks
+        row[8] = project.getApplicationOpenDate() != null ? DATE_FORMAT.format(project.getApplicationOpenDate()) : "";
+        row[9] = project.getApplicationCloseDate() != null ? DATE_FORMAT.format(project.getApplicationCloseDate()) : "";
 
-        // Officers
-        List<HdbOfficer> assignedOfficers = project.getAssignedOfficers();
-        for(int i = 0; i < 10; i++) {
+        // Manager NRIC (index 10)
+        row[10] = project.getManager() != null ? project.getManager().getNric() : "";
+
+        // Visibility (index 11)
+        row[11] = String.valueOf(project.isVisible()); // "true" or "false"
+
+        // Officers (indices 12 to 21)
+        List<HdbOfficer> assignedOfficers = project.getAssignedOfficers(); // Gets the list of non-null officers
+        for(int i = 0; i < 10; i++) { // Loop exactly 10 times for the 10 columns
             if (i < assignedOfficers.size()) {
+                // If there is an officer at this position in the list, get their NRIC
                 row[12 + i] = assignedOfficers.get(i).getNric();
             } else {
-                row[12 + i] = ""; // Empty string for empty slots
+                // Otherwise, fill the remaining CSV columns with empty strings
+                row[12 + i] = "";
             }
         }
 

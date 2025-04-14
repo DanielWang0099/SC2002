@@ -217,11 +217,10 @@ public class ProjectController {
         }
         Project project = projectOpt.get();
 
-        // Authorization: Assume only assigned manager can toggle? PDF isn't explicit[cite: 26]. Let's allow for now.
-        // if (!manager.equals(project.getManager())) {
-        //     System.err.println("Visibility Toggle Error: Not authorized.");
-        //     return false;
-        // }
+        if (!manager.equals(project.getManager())) {
+            System.err.println("Visibility Toggle Error: Not authorized.");
+            return false;
+       }
 
         project.setVisibility(isVisible);
         Database.getProjectsRepository().save(project); // Persist change
@@ -251,7 +250,7 @@ public class ProjectController {
 
 
     // --- Helper methods ---
-     public List<Project> getFilteredProjects(User requestingUser, String neighborhood, FlatType flatType,
+/*      public List<Project> getFilteredProjects(User requestingUser, String neighborhood, FlatType flatType,
             String managerNric, Date[] dateRange,
             String sortByField, boolean sortAscending) {
 
@@ -289,6 +288,90 @@ public class ProjectController {
         sortProjects(finalViewableProjects, sortByField, sortAscending);
 
         return finalViewableProjects;
+    } */
+
+    public List<Project> getFilteredProjects(User requestingUser, String neighborhood, FlatType flatType,
+                                             String managerNric, Date[] dateRange,
+                                             String sortByField, boolean sortAscending) {
+
+        // 1. Initial Filter based on USER-SPECIFIED criteria (excluding role-based visibility for now)
+        List<Project> potentiallyRelevantProjects = Database.getProjectsRepository()
+                .findByCriteria(neighborhood, flatType, managerNric, null, dateRange); // Visibility = null initially
+
+        // 2. Apply Role-Based Access/Visibility Rules AND Applicant Flat Type Eligibility
+        Stream<Project> viewableProjectsStream;
+        Role userRole = (requestingUser != null) ? requestingUser.getRole() : null;
+
+        if (userRole == Role.HDB_MANAGER) {
+            // Managers see all projects matching the filters, regardless of visibility or flat types.
+            viewableProjectsStream = potentiallyRelevantProjects.stream();
+
+        } else if (userRole == Role.HDB_OFFICER) {
+            // Officers see projects they handle OR projects that are visible.
+            // The flat type eligibility rule doesn't strictly apply to their *viewing* capability for handled projects.
+            // For non-handled projects, they view like applicants, so eligibility rules apply there.
+            final String officerNric = requestingUser.getNric();
+            viewableProjectsStream = potentiallyRelevantProjects.stream()
+                    .filter(p -> {
+                        boolean isHandled = isOfficerAssigned(p, officerNric);
+                        if (isHandled) return true; // See handled projects regardless of visibility/type eligibility
+                        if (!p.isVisible()) return false; // If not handled, must be visible
+
+                        // If visible & not handled, check applicant flat type eligibility
+                        if (requestingUser instanceof Applicant) { // Check if officer object can be cast
+                             return isApplicantEligibleToViewProject( (Applicant) requestingUser, p);
+                        } else {
+                             // Should not happen if model is correct, but default to visible if cast fails
+                             return true;
+                        }
+                    });
+
+        } else { // Applicant role or null (unauthenticated) user
+            // Applicants only see visible projects AND projects offering flats they are eligible for.
+            viewableProjectsStream = potentiallyRelevantProjects.stream()
+                    .filter(Project::isVisible) // Must be visible
+                    .filter(p -> { // Must meet eligibility
+                        if (requestingUser instanceof Applicant) {
+                           return isApplicantEligibleToViewProject((Applicant) requestingUser, p);
+                        } else {
+                           // Unauthenticated users? Assume they can see all visible projects
+                           // Or apply some default eligibility? Let's allow all visible for now.
+                           return true;
+                        }
+                     });
+        }
+
+        // 3. Collect the viewable projects into a list
+        List<Project> finalViewableProjects = viewableProjectsStream.collect(Collectors.toList());
+
+        // 4. Perform Sorting on the final list
+        sortProjects(finalViewableProjects, sortByField, sortAscending);
+
+        return finalViewableProjects;
+    }
+
+    private boolean isApplicantEligibleToViewProject(Applicant applicant, Project project) {
+        if (applicant == null || project == null) return false; // Or maybe true for project==null? Default false.
+
+        int age = applicant.getAge();
+        MaritalStatus status = applicant.getMaritalStatus();
+
+        if (status == MaritalStatus.MARRIED && age >= 21) {
+            // Married >= 21 can view any project (that offers any flats)
+            return project.getInitialUnitCount(FlatType.TWO_ROOM) > 0 || project.getInitialUnitCount(FlatType.THREE_ROOM) > 0;
+        } else if (status == MaritalStatus.SINGLE && age >= 35) {
+            // Single >= 35 can ONLY view projects that offer 2-Room flats.
+            return project.getInitialUnitCount(FlatType.TWO_ROOM) > 0;
+        } else {
+            // Includes Single < 35, or Married < 21.
+            // PDF rule [cite: 12] is about *applying*. PDF rule [cite: 10] says view based on user group & visibility.
+            // Let's interpret this as: If you don't meet the specific application criteria (Married>=21 or Single>=35),
+            // you can still VIEW any *visible* project (as per [cite: 10]), but you won't be able to apply later.
+            // Therefore, return true here for viewing purposes. The apply logic will block later.
+             return project.getInitialUnitCount(FlatType.TWO_ROOM) > 0 || project.getInitialUnitCount(FlatType.THREE_ROOM) > 0;
+            // --- OR --- Stricter Interpretation (cannot view if cannot apply):
+                // return false; // If Single < 35 or Married < 21 cannot even view? Less likely based on wording.
+        }
     }
 
     public List<Project> getProjectsByManager(HdbManager manager, String neighborhood, FlatType flatType, Date[] dateRange,

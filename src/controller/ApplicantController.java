@@ -8,6 +8,7 @@ import entities.documents.*;
 import entities.user.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class ApplicantController {
 
@@ -34,7 +35,7 @@ public class ApplicantController {
      * @param projectName The name of the project to apply for.
      * @return The created ProjectApplication object if successful, null otherwise.
      */
-    public ProjectApplication applyForProject(Applicant applicant, String projectName) {
+/*     public ProjectApplication applyForProject(Applicant applicant, String projectName) {
         // 1. Find Project
         Optional<Project> projectOpt = Database.getProjectsRepository().findById(projectName);
         if (projectOpt.isEmpty()) {
@@ -75,9 +76,63 @@ public class ApplicantController {
         Database.getDocumentsRepository().saveDocument(application);
         System.out.println("Application submitted successfully by " + applicant.getNric() + " for project '" + projectName + "'. Application ID: " + application.getDocumentID());
         return application;
+    } */
+
+    public ProjectApplication applyForProject(Applicant applicant, String projectName) {
+        // 1. Find Project
+        Optional<Project> projectOpt = Database.getProjectsRepository().findById(projectName);
+        if (projectOpt.isEmpty()) {
+            System.err.println("Application Error: Project '" + projectName + "' not found.");
+            return null;
+        }
+        Project project = projectOpt.get();
+
+        // 2. Check Visibility (Applicants can only apply to visible projects)
+        if (!project.isVisible()) {
+            System.err.println("Application Error: Project '" + projectName + "' is not currently open for applications (not visible).");
+            return null;
+        }
+
+        // 3. *** ADDED: Strict Eligibility Check based on PDF Rules ***
+        if (!isEligibleToApply(applicant, project)) {
+             System.err.println("Application Error: Applicant " + applicant.getNric() +
+                                " (Age: " + applicant.getAge() + ", Status: " + applicant.getMaritalStatus() +
+                                ") is not eligible to apply for project '" + projectName +
+                                "' based on offered flat types (" + project.getInitialFlatUnitCounts().keySet() + ").");
+             // Provide more specific reason based on rules if desired
+             if(applicant.getMaritalStatus() == MaritalStatus.SINGLE && applicant.getAge() >= 35) {
+                  System.err.println("Reason: Singles aged 35+ can only apply for projects offering 2-Room flats.");
+             } else if (applicant.getMaritalStatus() == MaritalStatus.MARRIED && applicant.getAge() < 21) {
+                  System.err.println("Reason: Married applicants must be 21 or older.");
+             } else if (applicant.getMaritalStatus() == MaritalStatus.SINGLE && applicant.getAge() < 35) {
+                  System.err.println("Reason: Single applicants must be 35 or older.");
+             }
+             return null; // Application rejected due to eligibility
+        }
+        // --- End of Eligibility Check ---
+
+        // 4. Check if applicant already has an active application
+        Optional<ProjectApplication> existingApp = Database.getDocumentsRepository().getApplicationRepository().findActiveApplicationByApplicantNric(applicant.getNric());
+        if (existingApp.isPresent()) {
+            System.err.println("Application Error: Applicant " + applicant.getNric() + " already has an active/pending application (ID: " + existingApp.get().getDocumentID() + "). Cannot apply for multiple projects.");
+            return null;
+        }
+
+        // 5. Create and Save Application (Eligibility passed)
+        // Use the static factory method for clarity
+        ProjectApplication application = ProjectApplication.createNewProjectApplication(applicant, project);
+
+        // Submit it immediately
+        boolean submitted = application.submit(applicant);
+        if (!submitted) {
+             System.err.println("Application Error: Failed to set application status to submitted for " + application.getDocumentID());
+             return null; // Should not happen if created in DRAFT
+        }
+
+        Database.getDocumentsRepository().saveDocument(application); // Save via facade
+        System.out.println("Application submitted successfully by " + applicant.getNric() + " for project '" + projectName + "'. Application ID: " + application.getDocumentID());
+        return application;
     }
-
-
     /**
      * Retrieves the status and details of applications submitted by the applicant.
      * @param applicant The applicant user.
@@ -215,6 +270,24 @@ public class ApplicantController {
         }
     } */
 
+    private boolean isEligibleToApply(Applicant applicant, Project project) {
+        if (applicant == null || project == null) return false;
+
+        int age = applicant.getAge();
+        MaritalStatus maritalStatus = applicant.getMaritalStatus();
+        Set<FlatType> offeredTypes = project.getInitialFlatUnitCounts().keySet(); // Get offered types
+
+        if (maritalStatus == MaritalStatus.MARRIED && age >= 21) {
+            // Married >= 21 can apply if project offers ANY flats
+            return !offeredTypes.isEmpty();
+        } else if (maritalStatus == MaritalStatus.SINGLE && age >= 35) {
+            // Single >= 35 can ONLY apply if project offers TWO_ROOM flats
+            return offeredTypes.contains(FlatType.TWO_ROOM);
+        } else {
+            // All other cases (Single < 35, Married < 21) are ineligible to apply
+            return false;
+        }
+    }
      public boolean deleteEnquiry(Applicant applicant, String enquiryId) {
          Optional<Enquiry> enquiryOpt = Database.getDocumentsRepository().getEnquiryRepository().findById(enquiryId);
         if (enquiryOpt.isEmpty()) {
@@ -253,18 +326,13 @@ public class ApplicantController {
      }
 
     // --- Helper Methods ---
+
     public boolean checkEligibility(Applicant applicant, FlatType flatType) {
-        // Duplicated from ApplicantRepository - Service layer would solve this.
         int age = applicant.getAge();
         MaritalStatus status = applicant.getMaritalStatus();
-
-        if (status == MaritalStatus.MARRIED) {
-            return age >= 21;
-        } else if (status == MaritalStatus.SINGLE) {
-            return age >= 35 && flatType == FlatType.TWO_ROOM;
-        } else {
-            return false;
-        }
+        if (status == MaritalStatus.MARRIED) return age >= 21;
+        else if (status == MaritalStatus.SINGLE) return age >= 35 && flatType == FlatType.TWO_ROOM;
+        else return false;
     }
 
 }

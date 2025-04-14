@@ -14,7 +14,6 @@ import entities.database.*;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 public class HdbOfficerBoundary extends BaseBoundary {
@@ -74,7 +73,13 @@ public class HdbOfficerBoundary extends BaseBoundary {
             case 14: handleEditMyEnquiryAsApplicant(); break;
             case 15: handleDeleteMyEnquiryAsApplicant(); break;
             // General
-            case 16: handleChangePassword(); break;
+            case 16:                 
+            boolean changed = handleChangePassword(); // Use inherited helper method
+            if (changed){
+                System.out.println("Password change process completed. For security, please log in again.");
+                continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+            }
+            break;
             case 17: System.out.println("Logging out..."); continueLoop = false; break;
             default: System.out.println("Invalid choice.");
         }

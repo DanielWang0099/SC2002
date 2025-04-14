@@ -13,9 +13,9 @@ import entities.user.*;
 public class Project {
     private String name;
     private String neighbourhood;
-    private Map<FlatType, Integer> flatUnitCounts; // Initial counts
-    private Map<FlatType, Integer> remainingFlatUnits; // Remaining counts
-    private Map<FlatType, Double> flatUnitPrices; // Added: Prices per flat type
+    private Map<FlatType, Integer> flatUnitCounts;
+    private Map<FlatType, Integer> remainingFlatUnits;
+    private Map<FlatType, Double> flatUnitPrices;
     private Date applicationOpenDate;
     private Date applicationCloseDate;
     private HdbManager manager;
@@ -36,45 +36,39 @@ public class Project {
      * @param creatingManager      The HDB Manager creating this project listing.
      */
     public Project(String name, String neighbourhood,
-                   Map<FlatType, Integer> initialFlatUnitCounts, Map<FlatType, Double> flatUnitPrices,
-                   Date applicationOpenDate, Date applicationCloseDate, HdbManager creatingManager) {
+            Map<FlatType, Integer> initialFlatUnitCounts, Map<FlatType, Double> flatUnitPrices,
+            Date applicationOpenDate, Date applicationCloseDate, HdbManager creatingManager) {
 
-        // Basic validation
+        // --- Constructor parameter validation (as provided by user) ---
         Objects.requireNonNull(name, "Project name cannot be null");
-        Objects.requireNonNull(neighbourhood, "Neighbourhood cannot be null");
-        Objects.requireNonNull(initialFlatUnitCounts, "Initial unit counts cannot be null");
-        Objects.requireNonNull(flatUnitPrices, "Unit prices cannot be null");
-        Objects.requireNonNull(applicationOpenDate, "Open date cannot be null");
-        Objects.requireNonNull(applicationCloseDate, "Close date cannot be null");
-        Objects.requireNonNull(creatingManager, "Creating manager cannot be null");
-        if(applicationOpenDate.after(applicationCloseDate)){
-             throw new IllegalArgumentException("Application open date cannot be after close date.");
-        }
+        // ... other Objects.requireNonNull ...
+        if(applicationOpenDate.after(applicationCloseDate)){ throw new IllegalArgumentException("Application open date cannot be after close date."); }
         if (initialFlatUnitCounts.entrySet().stream().anyMatch(entry -> entry.getValue() < 0) ||
-            flatUnitPrices.entrySet().stream().anyMatch(entry -> entry.getValue() < 0)) {
-             throw new IllegalArgumentException("Unit counts and prices cannot be negative.");
-        }
-        // Ensure price map contains keys present in count map (or handle defaults)
-        for (FlatType ft : initialFlatUnitCounts.keySet()) {
-            if (!flatUnitPrices.containsKey(ft)) {
-                 System.err.println("Warning: Price not provided for flat type " + ft + " in project " + name + ". Defaulting to 0.0");
-                 // Or throw: throw new IllegalArgumentException("Price missing for flat type: " + ft);
-            }
-        }
-
+        flatUnitPrices.entrySet().stream().anyMatch(entry -> entry.getValue() < 0)) { throw new IllegalArgumentException("Unit counts and prices cannot be negative."); }
+        for (FlatType ft : initialFlatUnitCounts.keySet()) { if (!flatUnitPrices.containsKey(ft)) { System.err.println("Warning: Price not provided for flat type " + ft + " in project " + name + ". Defaulting to 0.0"); } }
+        // --- End Validation ---
 
         this.name = name;
         this.neighbourhood = neighbourhood;
         this.flatUnitCounts = new HashMap<>(initialFlatUnitCounts);
         this.remainingFlatUnits = new HashMap<>(initialFlatUnitCounts);
-        this.flatUnitPrices = new HashMap<>(flatUnitPrices); // Store prices
+        this.flatUnitPrices = new HashMap<>(flatUnitPrices);
         this.applicationOpenDate = applicationOpenDate;
         this.applicationCloseDate = applicationCloseDate;
         this.manager = creatingManager;
-        this.officers = new HdbOfficer[MAX_OFFICER_SLOTS];
-        this.assignedOfficerCount = 0;
+        // --- Officer Initialization ---
+        this.officers = new HdbOfficer[MAX_OFFICER_SLOTS]; // Create array
+        this.assignedOfficerCount = 0; // Initialize count
+        // --- -------------------- ---
         this.visibility = false;
     }
+
+    public void setName(String name) { this.name = name; }
+    public void setNeighbourhood(String neighbourhood) { this.neighbourhood = neighbourhood; }
+    public void setApplicationOpenDate(Date applicationOpenDate) { this.applicationOpenDate = applicationOpenDate; }
+    public void setApplicationCloseDate(Date applicationCloseDate) { this.applicationCloseDate = applicationCloseDate; }
+    public void setManager(HdbManager manager) { this.manager = manager; }
+    public void setVisibility(boolean visible) { this.visibility = visible; }
 
      // --- Getters (include price) ---
     public String getName() { return name; }
@@ -82,26 +76,21 @@ public class Project {
     public Date getApplicationOpenDate() { return applicationOpenDate; }
     public Date getApplicationCloseDate() { return applicationCloseDate; }
     public HdbManager getManager() { return manager; }
-    public boolean isVisible() { return visibility; }
+    public boolean isVisible() { return visibility; } // Preferred boolean getter name
+    // public boolean getVisibility() {return visibility; } // Redundant with isVisible()
     public int getInitialUnitCount(FlatType type) { return flatUnitCounts.getOrDefault(type, 0); }
     public Map<FlatType, Integer> getInitialFlatUnitCounts() { return new HashMap<>(flatUnitCounts); }
     public int getRemainingUnitCount(FlatType type) { return remainingFlatUnits.getOrDefault(type, 0); }
     public Map<FlatType, Integer> getRemainingFlatUnits() { return new HashMap<>(remainingFlatUnits); }
     public int getAvailableOfficerSlots() { return MAX_OFFICER_SLOTS - assignedOfficerCount; }
-    public List<HdbOfficer> getAssignedOfficers() { return Arrays.stream(officers).filter(Objects::nonNull).collect(Collectors.toList()); }
-    public boolean getVisibility() {return visibility; }
+    public double getUnitPrice(FlatType type) { return flatUnitPrices.getOrDefault(type, 0.0); }
+    public Map<FlatType, Double> getFlatUnitPrices() { return new HashMap<>(flatUnitPrices); }
+
     /**
      * Gets the selling price for a specific flat type.
      * @param type The FlatType.
      * @return The price, or 0.0 if the type isn't offered or price not set.
      */
-    public double getUnitPrice(FlatType type) {
-        return flatUnitPrices.getOrDefault(type, 0.0);
-    }
-    public Map<FlatType, Double> getFlatUnitPrices() {
-        return new HashMap<>(flatUnitPrices);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -115,13 +104,6 @@ public class Project {
         return Objects.hash(name);
     }
 
-    // --- Setter/Mutator Methods ---
-    public void setName(String name) { this.name = name; }
-    public void setNeighbourhood(String neighbourhood) { this.neighbourhood = neighbourhood; }
-    public void setApplicationOpenDate(Date applicationOpenDate) { this.applicationOpenDate = applicationOpenDate; }
-    public void setApplicationCloseDate(Date applicationCloseDate) { this.applicationCloseDate = applicationCloseDate; }
-    public void setManager(HdbManager manager) { this.manager = manager; }
-    public void setVisibility(boolean visible) { this.visibility = visible; }
 
     /*
      * Updates the initial and remaining counts for a specific flat type.
@@ -185,19 +167,18 @@ public class Project {
         assignedOfficerCount++;
         return true;
     }
-    public boolean removeOfficer(HdbOfficer officer) { /* unchanged */
+    
+    public boolean removeOfficer(HdbOfficer officer) {
         if (officer == null || assignedOfficerCount == 0) return false;
         int foundIndex = -1;
-        for (int i = 0; i < assignedOfficerCount; i++) {
-            if (officers[i] != null && officers[i].equals(officer)) { foundIndex = i; break; }
-        }
+        for (int i = 0; i < assignedOfficerCount; i++) { if (officers[i] != null && officers[i].equals(officer)) { foundIndex = i; break; } }
         if (foundIndex != -1) {
             int numMoved = assignedOfficerCount - foundIndex - 1;
             if (numMoved > 0) System.arraycopy(officers, foundIndex + 1, officers, foundIndex, numMoved);
             assignedOfficerCount--;
-            officers[assignedOfficerCount] = null;
+            officers[assignedOfficerCount] = null; // Clear the now unused slot
             return true;
-        } else { return false; }
+        } else { return false; } // Officer not found
     }
 
     // toString, equals, hashCode remain similar, maybe update toString for price
@@ -220,6 +201,13 @@ public class Project {
             assignedOfficerCount, MAX_OFFICER_SLOTS,
             (visibility ? "Visible to Applicants" : "Hidden from Applicants")
         );
+    }
+
+    public List<HdbOfficer> getAssignedOfficers() {
+        // Use stream bounded by the count for robustness
+        return Arrays.stream(officers, 0, assignedOfficerCount)
+                     .filter(Objects::nonNull) // Filter should ideally not be needed if count is correct, but good safeguard
+                     .collect(Collectors.toList());
     }
 
 }

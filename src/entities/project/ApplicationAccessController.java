@@ -12,7 +12,7 @@ public class ApplicationAccessController {
      * @return  true if applicant is elibible, false otherwise.
      */
     public boolean checkEligible(Project project, Applicant applicant) {
-        return project.getVisibility() && (applicant.getMaritalStatus() == MaritalStatus.SINGLE
+        return project.isVisible() && (applicant.getMaritalStatus() == MaritalStatus.SINGLE
             ? applicant.getAge() >= 35 && eligibleForSingle(project)
             : applicant.getAge() >= 21
         );
