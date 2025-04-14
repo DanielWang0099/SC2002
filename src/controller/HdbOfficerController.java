@@ -302,7 +302,7 @@ public class HdbOfficerController {
 
     public List<Project> getAvailableProjectsForViewing(HdbOfficer officer) {
         // Officers view projects like applicants, but also see handled ones regardless of visibility
-         List<Project> visibleProjects = projectController.getFilteredProjects(officer, null, null);
+         List<Project> visibleProjects = projectController.getFilteredProjects(officer, null, null, null, null, null, true);
          // viewHandledProjects already gets projects regardless of visibility
          // Combine and distinct
          List<Project> handled = viewHandledProjects(officer);

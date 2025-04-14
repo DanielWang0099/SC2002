@@ -23,8 +23,8 @@ public class ApplicantController {
      * @return List of viewable projects.
      */
     public List<Project> getAvailableProjects(Applicant applicant) {
-        // Use ProjectController's filtering, passing the applicant
-        return projectController.getFilteredProjects(applicant, null, null);
+        // Use ProjectController's filtering, passing the applicant and default sort order (ascending)
+        return projectController.getFilteredProjects(applicant, null, null, null, null, null, true);
     }
 
     /**

@@ -2,6 +2,7 @@ package boundary;
 
 import java.util.Scanner;
 import controller.MainController;
+import controller.ProjectController;
 import entities.user.*;
 import entities.project.*; // Project, FlatType, User, HdbManager, HdbOfficer etc.
 import entities.documents.approvableDocuments.*; // Needed for checking related docs on delete
@@ -318,37 +319,65 @@ public class HdbManagerBoundary extends BaseBoundary {
 
     private void handleViewAllProjects() {
         System.out.println("--- View All Projects ---");
-        // Get Filters
-        FlatType flatTypeFilter = promptForFlatTypeFilter();
-        String neighFilter = promptForNeighbourhoodFilter();
-        String managerNricFilter = promptForManagerNricFilter(); // Ask manager filter
-        Date[] dateRangeFilter = promptForDateRangeFilter();   // Ask date range filter
+        // --- Optional Filtering ---
+        FlatType flatTypeFilter = null;
+        String neighFilter = null;
+        String managerNricFilter = null;
+        Date[] dateRangeFilter = null;
+        if (getYesNoInput("Apply filters?")) {
+            flatTypeFilter = promptForFlatTypeFilter();
+            neighFilter = promptForNeighbourhoodFilter();
+            managerNricFilter = promptForManagerNricFilter();
+            dateRangeFilter = promptForDateRangeFilter();
+        }
 
-        System.out.println("Fetching all projects (applying filters)...");
+        // --- Optional Sorting ---
+        String sortBy = null;
+        boolean sortAsc = true;
+        if (getYesNoInput("Apply custom sorting? (Default: Project Name Ascending)")) {
+            sortBy = promptForSortFieldManager(); // Use specific helper for manager options
+            if (sortBy != null) sortAsc = getYesNoInput("Sort Ascending?");
+        }
 
-        // Call controller with all filters
+        System.out.println("Fetching all projects (applying filters/sort)...");
+
+        // Call controller with all filters and sorting
         List<Project> projects = mainController.getProjectController()
-            .getFilteredProjects(currentManager(), neighFilter, flatTypeFilter, managerNricFilter, dateRangeFilter);
+            .getFilteredProjects(currentManager(), neighFilter, flatTypeFilter, managerNricFilter, dateRangeFilter,
+                                 sortBy, sortAsc);
 
         displayProjectsList(projects, true); // Show manager info
     }
 
     private void handleViewMyProjects() {
         System.out.println("--- View My Managed Projects ---");
-        // Get Filters (Manager filter is implicit)
-        FlatType flatTypeFilter = promptForFlatTypeFilter();
-        String neighFilter = promptForNeighbourhoodFilter();
-        Date[] dateRangeFilter = promptForDateRangeFilter();
+       // --- Optional Filtering ---
+       FlatType flatTypeFilter = null;
+       String neighFilter = null;
+       // Manager filter is implicit
+       Date[] dateRangeFilter = null;
+       if (getYesNoInput("Apply filters (Neighbourhood, Flat Type, Date Range)?")) {
+           flatTypeFilter = promptForFlatTypeFilter();
+           neighFilter = promptForNeighbourhoodFilter();
+           dateRangeFilter = promptForDateRangeFilter();
+       }
 
-        System.out.println("Fetching projects you manage (applying filters)...");
+       // --- Optional Sorting ---
+       String sortBy = null;
+       boolean sortAsc = true;
+       if (getYesNoInput("Apply custom sorting? (Default: Project Name Ascending)")) {
+           sortBy = promptForSortFieldManager(); // Use manager sort options
+           if (sortBy != null) sortAsc = getYesNoInput("Sort Ascending?");
+       }
 
-        // Call controller with filters (Manager object passed for implicit filtering)
-       List<Project> projects = mainController.getProjectController()
-           .getProjectsByManager(currentManager(), neighFilter, flatTypeFilter, dateRangeFilter);
+       System.out.println("Fetching projects you manage (applying filters/sort)...");
+
+       // Call controller with filters and sorting (manager passed implicitly)
+       List<Project> projects = mainController.getProjectController().getFilteredProjects(currentManager(), neighFilter, flatTypeFilter, currentManager().getNric(), dateRangeFilter,
+                                 sortBy, sortAsc);
 
        displayProjectsList(projects, true); // Show manager info
    }
-
     private void handleViewPendingOfficerRegs() {
         System.out.println("Fetching pending officer registrations for your projects...");
         List<ProjectRegistration> regs = mainController.getHdbManagerController().viewPendingOfficerRegistrations(currentManager());
@@ -678,5 +707,23 @@ public class HdbManagerBoundary extends BaseBoundary {
              }
         }
         return new Date[]{startDate, endDate};
+    }
+
+    private String promptForSortFieldManager() {
+        System.out.println("Available Sort Fields:");
+        System.out.println(" 1. Project Name (Default)");
+        System.out.println(" 2. Neighbourhood");
+        System.out.println(" 3. Manager NRIC"); // Manager might want this
+        System.out.println(" 4. Application Open Date");
+        int choice = getUserChoice("Sort by field number (or press Enter for default): ");
+        switch (choice) {
+            case 1: return ProjectController.SORT_BY_NAME;
+            case 2: return ProjectController.SORT_BY_NEIGHBOURHOOD;
+            case 3: return ProjectController.SORT_BY_MANAGER;
+            case 4: return ProjectController.SORT_BY_OPEN_DATE;
+            default:
+                System.out.println("Using default sort by Project Name.");
+                return ProjectController.SORT_BY_NAME; // Default
+        }
     }
 }

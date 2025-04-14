@@ -16,6 +16,12 @@ import java.util.Comparator;
  */
 public class ProjectController {
 
+    public static final String SORT_BY_NAME = "NAME";
+    public static final String SORT_BY_NEIGHBOURHOOD = "NEIGHBOURHOOD";
+    public static final String SORT_BY_MANAGER = "MANAGER";
+    public static final String SORT_BY_OPEN_DATE = "OPENDATE";
+
+
     /**
      * Creates a new BTO project listing.
      * Only HDB Managers can perform this action.
@@ -232,38 +238,6 @@ public class ProjectController {
      * @param flatType Optional filter by flat type availability.
      * @return List of matching projects.
      */
-    public List<Project> getFilteredProjects(User requestingUser, String neighborhood, FlatType flatType) {
-        List<Project> allProjects = Database.getProjectsRepository().findAll(); // Get all projects first
-
-        Stream<Project> projectStream = allProjects.stream();
-
-        // Filter by neighborhood
-        if (neighborhood != null && !neighborhood.trim().isEmpty()) {
-            projectStream = projectStream.filter(p -> p.getNeighbourhood().equalsIgnoreCase(neighborhood.trim()));
-        }
-
-        // Filter by flat type availability
-        if (flatType != null) {
-            // Check if the project offers this flat type with initial units > 0
-            projectStream = projectStream.filter(p -> p.getInitialUnitCount(flatType) > 0);
-        }
-
-        // Filter by Visibility and Role
-        if (requestingUser == null || requestingUser.getRole() == Role.APPLICANT) {
-             // Applicants only see visible projects [cite: 10, 26]
-            projectStream = projectStream.filter(Project::isVisible);
-        } else if (requestingUser.getRole() == Role.HDB_OFFICER) {
-            // Officers see handled projects regardless of visibility, others based on visibility
-             final String officerNric = requestingUser.getNric();
-             projectStream = projectStream.filter(p -> p.isVisible() || isOfficerAssigned(p, officerNric));
-        }
-        // Managers see all projects regardless of visibility [cite: 27] - no extra filter needed
-
-        // Apply default sorting (e.g., alphabetical by name) [cite: 34]
-        return projectStream
-                .sorted(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER))
-                .collect(Collectors.toList());
-    }
 
     /**
      * Retrieves only the projects created by a specific manager.
@@ -277,82 +251,119 @@ public class ProjectController {
 
 
     // --- Helper methods ---
-
-    /**
-     * Helper to check if a manager is busy managing another project during a specific period.
-     * @param managerNric NRIC of the manager.
-     * @param startDate Start date of the period.
-     * @param endDate End date of the period.
-     * @return true if busy, false otherwise.
-     */
-     private boolean isManagerBusyDuringPeriod(String managerNric, Date startDate, Date endDate) {
-         Optional<User> userOpt = Database.getUsersRepository().findUserByNric(managerNric);
-         if(userOpt.isEmpty() || !(userOpt.get() instanceof HdbManager)) return false; // Should not happen if called correctly
-
-         HdbManager manager = (HdbManager) userOpt.get();
-         List<Project> managedProjects = Database.getProjectsRepository().findByManager(manager);
-
-         // Check for overlap with other projects managed by this manager
-         for (Project existingProject : managedProjects) {
-             // Check if periods overlap: (StartA <= EndB) and (EndA >= StartB)
-             boolean overlap = !existingProject.getApplicationOpenDate().after(endDate) &&
-                               !existingProject.getApplicationCloseDate().before(startDate);
-             if (overlap) {
-                 // Found an overlapping project period
-                 return true;
-             }
-         }
-         return false; // No overlapping periods found
-     }
-
-     /**
-      * Helper to check if a specific officer is assigned to a project.
-      * @param project Project object
-      * @param officerNric NRIC of the officer
-      * @return true if assigned, false otherwise
-      */
-     private boolean isOfficerAssigned(Project project, String officerNric) {
-         if (project == null || officerNric == null) return false;
-         return project.getAssignedOfficers().stream()
-                       .anyMatch(officer -> officer.getNric().equalsIgnoreCase(officerNric));
-     }
      public List<Project> getFilteredProjects(User requestingUser, String neighborhood, FlatType flatType,
-                                             String managerNric, Date[] dateRange) { // Added filters
+            String managerNric, Date[] dateRange,
+            String sortByField, boolean sortAscending) {
 
-        Boolean visibilityFilter = null; // Managers & Officers (initially) see all visibility
-        HdbManager managerFilter = null; // Specific manager object if needed for filtering handled projects
+        // 1. Initial Filter based on USER-SPECIFIED criteria (excluding role-based visibility for now)
+        //    Call repository with visibilityFilter = null to get all potential matches.
+        List<Project> potentiallyRelevantProjects = Database.getProjectsRepository()
+        .findByCriteria(neighborhood, flatType, managerNric, null, dateRange); // Visibility = null
 
-        if (requestingUser != null && requestingUser.getRole() == Role.HDB_MANAGER) {
-            // If manager is filtering by "my projects", set managerNric filter
-            // We handle the "my projects" view via getProjectsByManager instead for clarity.
-        } else if (requestingUser == null || requestingUser.getRole() == Role.APPLICANT) {
-            visibilityFilter = true; // Applicants only see visible=true projects
+        // 2. Apply Role-Based Access/Visibility Rules (using Streams for filtering the initial list)
+        Stream<Project> viewableProjectsStream;
+        Role userRole = (requestingUser != null) ? requestingUser.getRole() : null;
+
+        if (userRole == Role.HDB_MANAGER) {
+        // Managers see all projects matching the filters, regardless of visibility [cite: 27]
+        viewableProjectsStream = potentiallyRelevantProjects.stream();
+        // Note: If managerNric filter was applied, they only see that manager's projects.
+        // If they selected "View My Projects", the Boundary should pass manager's NRIC here.
+
+        } else if (userRole == Role.HDB_OFFICER) {
+        // Officers see projects they handle OR projects that are visible [cite: 9, 21]
+        final String officerNric = requestingUser.getNric();
+        viewableProjectsStream = potentiallyRelevantProjects.stream()
+        .filter(p -> p.isVisible() || isOfficerAssigned(p, officerNric));
+
+        } else { // Includes Applicant role and null (unauthenticated) users
+        // Applicants only see projects where visibility is true [cite: 10]
+        viewableProjectsStream = potentiallyRelevantProjects.stream()
+        .filter(Project::isVisible);
         }
-        // Officers handled below
 
-        // Call repository finder with all applicable filters
-        List<Project> filteredProjects = Database.getProjectsRepository()
-                .findByCriteria(neighborhood, flatType, managerNric, visibilityFilter, dateRange);
+        // 3. Collect the viewable projects into a list
+        List<Project> finalViewableProjects = viewableProjectsStream.collect(Collectors.toList());
 
-        // Apply Officer specific visibility logic AFTER basic filtering
-        if (requestingUser != null && requestingUser.getRole() == Role.HDB_OFFICER) {
-             final String officerNric = requestingUser.getNric();
-             // Re-fetch ALL matching filters first, then apply visibility logic for officers
-             List<Project> allMatching = Database.getProjectsRepository()
-                     .findByCriteria(neighborhood, flatType, managerNric, null, dateRange); // Visibility null
-             return allMatching.stream()
-                        .filter(p -> p.isVisible() || isOfficerAssigned(p, officerNric)) // Visible OR Handled by officer
-                        .sorted(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER))
-                        .collect(Collectors.toList());
-        }
+        // 4. Perform Sorting on the final list
+        sortProjects(finalViewableProjects, sortByField, sortAscending);
 
-        return filteredProjects; // Already sorted by repository for Applicant/Manager/null
+        return finalViewableProjects;
     }
 
-    public List<Project> getProjectsByManager(HdbManager manager, String neighborhood, FlatType flatType, Date[] dateRange) {
-        if (manager == null) return List.of();
-        // Use the repository method with the manager NRIC filter applied
-        return Database.getProjectsRepository()
-                       .findByCriteria(neighborhood, flatType, manager.getNric(), null, dateRange); // Visibility null = manager sees all their projects
-   }
+    public List<Project> getProjectsByManager(HdbManager manager, String neighborhood, FlatType flatType, Date[] dateRange,
+                    String sortByField, boolean sortAscending) {
+            if (manager == null) return List.of();
+            // Use the repository method with the manager NRIC filter applied
+            // Manager sees all their projects regardless of visibility (visibilityFilter = null)
+            List<Project> filteredProjects = Database.getProjectsRepository()
+            .findByCriteria(neighborhood, flatType, manager.getNric(), null, dateRange);
+
+            // Perform Sorting
+            sortProjects(filteredProjects, sortByField, sortAscending);
+
+            return filteredProjects;
+    }
+
+    private void sortProjects(List<Project> projects, String sortByField, boolean sortAscending) {
+        Comparator<Project> comparator = null;
+        // Determine the primary comparator based on sortByField
+        if (sortByField != null) {
+            switch (sortByField.toUpperCase()) {
+                case SORT_BY_NEIGHBOURHOOD:
+                    comparator = Comparator.comparing(Project::getNeighbourhood, String.CASE_INSENSITIVE_ORDER);
+                    break;
+                case SORT_BY_MANAGER:
+                    comparator = Comparator.comparing(
+                        p -> (p.getManager() != null ? p.getManager().getNric() : ""),
+                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
+                    );
+                    break;
+                case SORT_BY_OPEN_DATE:
+                     comparator = Comparator.comparing(
+                         Project::getApplicationOpenDate,
+                         Comparator.nullsLast(Comparator.naturalOrder())
+                     );
+                    break;
+                case SORT_BY_NAME: // Fallthrough default
+                default:
+                     comparator = Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER);
+                     break;
+             }
+        } else {
+             comparator = Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER); // Default
+        }
+        // Apply descending order if requested
+        if (!sortAscending && comparator != null) {
+            comparator = comparator.reversed();
+        }
+        // Sort the list
+        if (comparator != null) {
+           projects.sort(comparator);
+        }
+    }
+
+    private boolean isOfficerAssigned(Project project, String officerNric) {
+        if (project == null || officerNric == null) return false;
+        // Assumes Project.getAssignedOfficers() returns the list of HdbOfficer objects
+        return project.getAssignedOfficers().stream()
+                      .anyMatch(officer -> officer.getNric().equalsIgnoreCase(officerNric));
+    }
+
+    // --- Helper method for checking manager availability (unchanged) ---
+     private boolean isManagerBusyDuringPeriod(String managerNric, Date startDate, Date endDate) {
+         // ... unchanged logic using findProjectsInApplicationPeriod ...
+           Optional<User> userOpt = Database.getUsersRepository().findUserByNric(managerNric);
+           if(userOpt.isEmpty() || !(userOpt.get() instanceof HdbManager)) return false;
+           HdbManager manager = (HdbManager) userOpt.get();
+           List<Project> managedProjects = Database.getProjectsRepository().findByManagerNric(manager.getNric()); // Use NRIC version
+
+           for (Project existingProject : managedProjects) {
+               boolean overlap = !existingProject.getApplicationOpenDate().after(endDate) &&
+                                 !existingProject.getApplicationCloseDate().before(startDate);
+               if (overlap) return true;
+           }
+           return false;
+     }
+    
 }
