@@ -102,7 +102,7 @@ public class ProjectsRepository implements IRepository<Project, String> {
 
             // Load assigned officers
             for (int i = 0; i < 10; i++) {
-                 int officerColIndex = row.length - 8 + i; // Index for OfficerNRIC[i+1]
+                 int officerColIndex = row.length - 10 + i; // Index for OfficerNRIC[i+1]
                  if (officerColIndex < row.length && !row[officerColIndex].isEmpty()) {
                      String officerNric = row[officerColIndex];
                       Optional<User> officerOpt = Database.getUsersRepository().findUserByNric(officerNric);

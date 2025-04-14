@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import entities.database.repositories.documentsRepositories.*;
-import entities.database.repositories.usersRepositories.ApplicantRepository;
-import entities.database.repositories.usersRepositories.HdbManagerRepository;
-import entities.database.repositories.usersRepositories.HdbOfficerRepository;
 import entities.documents.approvableDocuments.*;
 import entities.documents.*;
 import entities.documents.repliableDocuments.*;
@@ -41,11 +38,6 @@ public class DocumentsRepository { // Not implementing IRepository<IBaseSubmitta
         this.enquiryRepository = new EnquiryRepository();
         // DO NOT call loading here
         System.out.println("DocumentsRepository Facade instances created.");
-    }
-
-    private void loadInitialDocuments() {
-            // TODO: Load any persistent documents from storage if needed
-        System.out.println("Document loading placeholder (if needed).");
     }
 
     /**
