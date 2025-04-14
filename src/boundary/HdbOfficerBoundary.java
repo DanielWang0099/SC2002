@@ -2,6 +2,7 @@ package boundary;
 
 import java.util.Scanner;
 import controller.MainController;
+import controller.ProjectController;
 import entities.user.*;
 import entities.project.*; // Project, FlatType, User, HdbManager, HdbOfficer etc.
 import entities.documents.approvableDocuments.*; // Needed for checking related docs on delete
@@ -13,6 +14,7 @@ import entities.database.*;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 public class HdbOfficerBoundary extends BaseBoundary {
@@ -88,10 +90,25 @@ public class HdbOfficerBoundary extends BaseBoundary {
     }
 
     private void handleRegisterForProject() {
+
+        FlatType flatTypeFilter = null;
+        String neighFilter = null;
+         if (getYesNoInput("Apply filters?")) {
+            flatTypeFilter = promptForFlatTypeFilter();
+            neighFilter = promptForNeighbourhoodFilter();
+        }
+        String sortBy = null;
+        boolean sortAsc = true;
+         if (getYesNoInput("Apply custom sorting? (Default: Project Name Ascending)")) {
+           sortBy = promptForSortField();
+           if (sortBy != null) sortAsc = getYesNoInput("Sort Ascending?");
+        }
+
          System.out.println("Fetching projects open for registration...");
          // Show projects the officer could potentially register for (visible or not?)
          // Let's show all projects for now, controller will check eligibility
-         List<Project> allProjects = mainController.getProjectController().getFilteredProjects(currentUser, null, null); // Use officer view logic maybe?
+        List<Project> allProjects = mainController.getProjectController()
+                                     .getFilteredProjects(currentOfficer(), neighFilter, flatTypeFilter, null, null, sortBy, sortAsc);// Use officer view logic maybe?
          if (!displayProjectsList(allProjects, false)) return;
 
          String projectName = getStringInput("Enter Project Name to register for (or 'cancel'): ");
@@ -236,30 +253,56 @@ public class HdbOfficerBoundary extends BaseBoundary {
 
 
     // --- Applicant Function Handlers (Delegation) ---
-
     private void handleViewAvailableProjectsAsApplicant() {
         System.out.println("--- View Available BTO Projects (Officer's View) ---");
-         // Get Filters
-        FlatType flatTypeFilter = promptForFlatTypeFilter(); // Add this helper method
-        String neighFilter = promptForNeighbourhoodFilter(); // Add this helper method
-        // Officers viewing general list likely don't filter by manager or date range either
-        // String managerNricFilter = null;
-        // Date[] dateRangeFilter = null;
 
-        System.out.println("Fetching available projects" +
-                           (flatTypeFilter != null ? " offering " + flatTypeFilter : "") +
-                           (neighFilter != null ? " in " + neighFilter : "") + "...");
+        // --- Optional Filtering ---
+        FlatType flatTypeFilter = null;
+        String neighFilter = null;
+        if (getYesNoInput("Apply filters?")) {
+            flatTypeFilter = promptForFlatTypeFilter();
+            neighFilter = promptForNeighbourhoodFilter();
+        }
 
-        // Call controller with filters - pass null for manager/date
+        // --- Optional Sorting ---
+        String sortBy = null;
+        boolean sortAsc = true; // Default ascending
+        if (getYesNoInput("Apply custom sorting? (Default: Project Name Ascending)")) {
+            sortBy = promptForSortField(); // Use helper method below
+            if (sortBy != null) { // Only ask for order if a field was chosen
+                 sortAsc = getYesNoInput("Sort Ascending?");
+            }
+        }
+
+        System.out.println("Fetching available projects...");
+
+        // Call controller with filters and sorting
         List<Project> projects = mainController.getProjectController()
-            .getFilteredProjects(currentOfficer(), neighFilter, flatTypeFilter, null, null); // Pass nulls
+            .getFilteredProjects(currentOfficer(), neighFilter, flatTypeFilter, null, null, // No manager/date filter for applicants
+                                 sortBy, sortAsc); // Pass sorting info
 
-        displayProjectsList(projects, false); // Use standard applicant view format
+        displayProjectsList(projects, false);
     }
 
     private void handleApplyForProjectAsApplicant() {
          System.out.println("Available Projects (Applicant View):");
-         List<Project> projects = mainController.getHdbOfficerController().getAvailableProjectsForViewing(currentOfficer());
+
+         FlatType flatTypeFilter = null;
+         String neighFilter = null;
+          if (getYesNoInput("Apply filters?")) {
+             flatTypeFilter = promptForFlatTypeFilter();
+             neighFilter = promptForNeighbourhoodFilter();
+         }
+         String sortBy = null;
+         boolean sortAsc = true;
+          if (getYesNoInput("Apply custom sorting? (Default: Project Name Ascending)")) {
+            sortBy = promptForSortField();
+            if (sortBy != null) sortAsc = getYesNoInput("Sort Ascending?");
+         }
+
+         List<Project> projects = mainController.getProjectController()
+                                     .getFilteredProjects(currentOfficer(), neighFilter, flatTypeFilter, null, null, sortBy, sortAsc);
+
          if (!displayProjectsList(projects, false)) return;
 
          String projectName = getStringInput("Enter the Project Name to apply for (or type 'cancel'): ");
@@ -486,4 +529,21 @@ public class HdbOfficerBoundary extends BaseBoundary {
         return true;
     }
 
-}
+    
+    private String promptForSortField() {
+        System.out.println("Available Sort Fields:");
+        System.out.println(" 1. Project Name (Default)");
+        System.out.println(" 2. Neighbourhood");
+        // Add others here if implemented in Controller (e.g., Open Date)
+        System.out.println(" 3. Application Open Date");
+        int choice = getUserChoice("Sort by field number (or press Enter for default): ");
+        switch (choice) {
+            case 1: return ProjectController.SORT_BY_NAME; // Use constants
+            case 2: return ProjectController.SORT_BY_NEIGHBOURHOOD;
+            case 3: return ProjectController.SORT_BY_OPEN_DATE;
+            default:
+                System.out.println("Using default sort by Project Name.");
+                return ProjectController.SORT_BY_NAME; // Default
+        }
+    }
+}   

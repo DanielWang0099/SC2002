@@ -212,54 +212,46 @@ public class ProjectsRepository implements IRepository<Project, String> {
                          .collect(Collectors.toList());
     }
 
-     public List<Project> findByCriteria(String neighborhoodFilter, FlatType flatTypeFilter,
-            String managerNricFilter, // Changed from HdbManager object to NRIC String
-            Boolean visibilityFilter,
-            Date[] dateRangeFilter) { // Added Date range filter
+    public List<Project> findByCriteria(String neighborhoodFilter, FlatType flatTypeFilter,
+                                        String managerNricFilter, Boolean visibilityFilter,
+                                        Date[] dateRangeFilter) {
 
         Stream<Project> projectStream = projectMap.values().stream();
 
-        // Apply neighborhood filter
+        // Apply filters... (logic as implemented previously)
         if (neighborhoodFilter != null && !neighborhoodFilter.trim().isEmpty()) {
-        final String finalNeighFilter = neighborhoodFilter.trim(); // For use in lambda
-        projectStream = projectStream.filter(project -> project.getNeighbourhood()
-                                        .equalsIgnoreCase(finalNeighFilter));
-        }
+            final String finalNeighFilter = neighborhoodFilter.trim(); // For use in lambda
+            projectStream = projectStream.filter(project -> project.getNeighbourhood()
+                                            .equalsIgnoreCase(finalNeighFilter));
+            }
 
-        // Apply flat type filter
         if (flatTypeFilter != null) {
         projectStream = projectStream.filter(project -> project.getInitialUnitCount(flatTypeFilter) > 0);
         }
-
-        // Apply manager filter (using NRIC)
         if (managerNricFilter != null && !managerNricFilter.trim().isEmpty()) {
-        final String finalManagerNric = managerNricFilter.trim(); // For use in lambda
-        projectStream = projectStream.filter(project -> project.getManager() != null &&
-                            project.getManager().getNric().equalsIgnoreCase(finalManagerNric));
-        }
-
-        // Apply visibility filter
+            final String finalManagerNric = managerNricFilter.trim(); // For use in lambda
+            projectStream = projectStream.filter(project -> project.getManager() != null &&
+                                project.getManager().getNric().equalsIgnoreCase(finalManagerNric));
+            }
+        
         if (visibilityFilter != null) {
-        projectStream = projectStream.filter(project -> project.isVisible() == visibilityFilter);
-        }
+                projectStream = projectStream.filter(project -> project.isVisible() == visibilityFilter);
+                }
 
+        
         if (dateRangeFilter != null && dateRangeFilter.length == 2 &&
-            dateRangeFilter[0] != null && dateRangeFilter[1] != null &&
-            !dateRangeFilter[0].after(dateRangeFilter[1])) { // Check for valid range
-                final Date filterStart = dateRangeFilter[0];
-                final Date filterEnd = dateRangeFilter[1];
-                projectStream = projectStream.filter(project ->
-                    project.getApplicationOpenDate() != null && project.getApplicationCloseDate() != null &&
-                    !project.getApplicationOpenDate().after(filterEnd) && // Project starts before or when filter ends
-                    !project.getApplicationCloseDate().before(filterStart) // Project ends after or when filter starts
-                );
-        }
-
-
-        // Return sorted list
-        return projectStream
-                .sorted(Comparator.comparing(Project::getName, String.CASE_INSENSITIVE_ORDER))
-                .collect(Collectors.toList());
+                dateRangeFilter[0] != null && dateRangeFilter[1] != null &&
+                !dateRangeFilter[0].after(dateRangeFilter[1])) { // Check for valid range
+                    final Date filterStart = dateRangeFilter[0];
+                    final Date filterEnd = dateRangeFilter[1];
+                    projectStream = projectStream.filter(project ->
+                        project.getApplicationOpenDate() != null && project.getApplicationCloseDate() != null &&
+                        !project.getApplicationOpenDate().after(filterEnd) && // Project starts before or when filter ends
+                        !project.getApplicationCloseDate().before(filterStart) // Project ends after or when filter starts
+                    );
+            }
+        // Return filtered list (sorting removed)
+        return projectStream.collect(Collectors.toList()); // COLLECT WITHOUT SORTING HERE
     }
 
 
