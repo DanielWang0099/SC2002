@@ -79,13 +79,17 @@ public abstract class BaseBoundary {
      * @return The FlatType if provided and valid; null if skipped.
      */
     protected FlatType promptForFlatTypeFilter() {
+        System.out.println("\n--- Flat Type Filter ---");
         System.out.print("Enter Flat Type for filter (TWO_ROOM or THREE_ROOM, or press Enter to skip): ");
         String input = scanner.nextLine().trim();
         if (input.isEmpty()) {
+            System.out.println("No Flat Type filter applied.");
             return null;
         }
         try {
-            return FlatType.valueOf(input.toUpperCase());
+            FlatType flatType = FlatType.valueOf(input.toUpperCase());
+            System.out.println("Flat Type filter set to: " + flatType);
+            return flatType;
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid Flat Type entered. Skipping flat type filter.");
             return null;
@@ -97,9 +101,16 @@ public abstract class BaseBoundary {
      * @return The neighbourhood string if provided; null if skipped.
      */
     protected String promptForNeighbourhoodFilter() {
+        System.out.println("\n--- Neighbourhood Filter ---");
         System.out.print("Enter Neighbourhood for filter (or press Enter to skip): ");
         String input = scanner.nextLine().trim();
-        return input.isEmpty() ? null : input;
+        if (input.isEmpty()) {
+            System.out.println("No Neighbourhood filter applied.");
+            return null;
+        } else {
+            System.out.println("Neighbourhood filter set to: " + input);
+            return input;
+        }
     }
 
     /**
@@ -108,6 +119,7 @@ public abstract class BaseBoundary {
      * @return true for 'yes', false for 'no'.
      */
     protected boolean getYesNoInput(String prompt) {
+        System.out.println("\n--- Confirmation Required ---");
         while (true) {
             System.out.print(prompt + " (y/n): ");
             String input = scanner.nextLine().trim().toLowerCase();
@@ -127,6 +139,7 @@ public abstract class BaseBoundary {
      * @return The parsed Date object, or null if input is invalid.
      */
     protected Date getDateInput(String prompt) {
+        System.out.println("\n--- Date Input ---");
         Date date = null;
         while (date == null) {
             System.out.print(prompt + " (yyyy-MM-dd): ");
@@ -141,6 +154,7 @@ public abstract class BaseBoundary {
                 System.out.println("Invalid date format. Please use yyyy-MM-dd or type 'cancel'.");
             }
         }
+        System.out.println("Date entered: " + INPUT_DATE_FORMAT.format(date));
         return date;
     }
 
@@ -183,7 +197,9 @@ public abstract class BaseBoundary {
      * Helper method within boundaries to handle the change password interaction.
      */
     protected boolean handleChangePassword() {
-        System.out.println("\n--- Change Password ---");
+        System.out.println("\n==========================================");
+        System.out.println("           Change Password");
+        System.out.println("==========================================");
         String oldPassword = getStringInput("Enter Current Password: ");
         String newPassword1 = getStringInput("Enter New Password: ");
         String newPassword2 = getStringInput("Confirm New Password: ");
@@ -198,10 +214,12 @@ public abstract class BaseBoundary {
 
         if (success) {
             System.out.println("Password change successful.");
+            System.out.println("==========================================");
             return true;
             // Note: User object in currentUser is updated, data file saved on exit.
         } else {
             System.out.println("Password change failed. Please check current password and try again.");
+            System.out.println("==========================================");
             // Specific error messages (e.g., too short, same as old) handled by Controller.\
             return false;
         }

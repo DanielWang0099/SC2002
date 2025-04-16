@@ -44,9 +44,8 @@ public class ApplicantBoundary extends BaseBoundary {
 
     @Override
     protected boolean processCommandOption(int choice) {
-        boolean continueLoop = true;
         switch (choice) {
-            case 0 -> { System.out.println("Logging out..."); continueLoop = false; }
+            case 0 -> { System.out.println("Logging out..."); return false; }
             case 1 -> handleViewAvailableProjects();
             case 2 -> handleApplyForProject();
             case 3 -> handleViewMyApplications();
@@ -59,12 +58,16 @@ public class ApplicantBoundary extends BaseBoundary {
                 boolean changed = handleChangePassword(); // Use inherited helper method
                 if (changed){
                     System.out.println("Password change process completed. For security, please log in again.");
-                    continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+                    return false;
                 }
+            }
+            case 10 -> {
+                System.out.println("Logging out...");
+                return false;
             }
             default -> System.out.println("Invalid choice. Please try again.");
         }
-        return continueLoop;
+        return true;
     }
 
     // --- Action Handlers ---

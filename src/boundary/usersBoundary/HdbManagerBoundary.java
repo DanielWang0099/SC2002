@@ -61,7 +61,7 @@ public class HdbManagerBoundary extends BaseBoundary {
     protected boolean processCommandOption(int choice) {
          boolean continueLoop = true;
          switch (choice) {
-            case 0 -> { System.out.println("Logging out..."); continueLoop = false; }
+            case 0 -> { System.out.println("Logging out..."); return false; }
             // Project Management
             case 1 -> handleCreateProject();
             case 2 -> handleEditProject();
@@ -88,7 +88,7 @@ public class HdbManagerBoundary extends BaseBoundary {
                 boolean changed = handleChangePassword(); // Use inherited helper method
                 if (changed){
                     System.out.println("Password change process completed. For security, please log in again.");
-                    continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+                    return false;
                 }
             }
             default -> System.out.println("Invalid choice. Please try again.");
@@ -296,34 +296,6 @@ public class HdbManagerBoundary extends BaseBoundary {
               System.out.println("Deletion cancelled.");
          }
      }
-
-/*     private void handleToggleVisibility() {
-         System.out.println("--- Toggle Project Visibility ---");
-         System.out.println("Projects you manage:");
-         List<Project> myProjects = mainController.getHdbManagerController().viewMyProjects(currentManager());
-         if(!displayProjectsList(myProjects, true)) return; // Show visibility status
-
-         String projectName = getStringInput("Enter name of project to toggle visibility for (or 'cancel'): ");
-         if(projectName.equalsIgnoreCase("cancel")) return;
-
-         Optional<Project> projectOpt = myProjects.stream().filter(p -> p.getName().equals(projectName)).findFirst();
-         if (projectOpt.isEmpty()) {
-             System.out.println("Project not found or you do not manage it.");
-             return;
-         }
-         Project project = projectOpt.get();
-
-         boolean currentVisibility = project.isVisible();
-         boolean makeVisible = getYesNoInput("Project is currently " + (currentVisibility ? "Visible" : "Hidden") + ". Set visibility to " + (!currentVisibility ? "Visible" : "Hidden") + "?");
-
-         if (makeVisible = true) { // Only proceed if toggling
-             boolean success = mainController.getHdbManagerController().toggleProjectVisibility(currentManager(), projectName, makeVisible);
-             if (success) System.out.println("Visibility updated."); else System.out.println("Failed to update visibility.");
-         } else {
-            
-              System.out.println("Visibility not changed.");
-         }
-    } */
 
     private void handleToggleVisibility() {
         System.out.println("--- Toggle Project Visibility ---");

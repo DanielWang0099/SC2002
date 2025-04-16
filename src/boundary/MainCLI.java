@@ -85,6 +85,10 @@ public class MainCLI {
      * @param user The logged-in user.
      */
     private void dispatchToUserBoundary(User user) {
+        System.out.println("\n========================================");
+        System.out.println(" User Role Dispatch ");
+        System.out.println("========================================");
+
         BaseBoundary userBoundary = null;
 
         // Check user object and role are not null before switching
@@ -106,7 +110,10 @@ public class MainCLI {
 
         if (userBoundary != null) {
             System.out.println("\nRedirecting to " + user.getRole() + " menu...");
-            userBoundary.runMenuLoop(); // Start the interaction loop for the user's role
+            userBoundary.runMenuLoop();
+            System.out.println("\n========================================");
+            System.out.println(" End of " + user.getRole() + " Session ");
+            System.out.println("========================================");
         }
     }
 
