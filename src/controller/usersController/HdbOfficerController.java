@@ -17,13 +17,12 @@ import java.util.stream.*;
 import controller.ProjectController;
 
 
-public class HdbOfficerController {
+public class HdbOfficerController extends BaseController {
 
-    private final ProjectController projectController;
     private final ApplicantController applicantController; // To reuse applicant functions
 
     public HdbOfficerController(ProjectController projectController, ApplicantController applicantController) {
-        this.projectController = projectController;
+        super(projectController);
         this.applicantController = applicantController;
     }
 
