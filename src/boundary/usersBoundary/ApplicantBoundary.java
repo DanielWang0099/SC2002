@@ -12,6 +12,20 @@ import java.util.List;
 import java.util.stream.*;
 
 public class ApplicantBoundary extends BaseBoundary {
+    private static final String[] menuOptions = {
+        "#BTO Application",
+        "View Available BTO Projects",
+        "Apply for Project",
+        "View My Application Status",
+        "Request Application Withdrawal",
+        "#Enquiries",
+        "Create Enquiry",
+        "View My Enquiries",
+        "Edit My Enquiry",
+        "Delete My Enquiry",
+        "#General",
+        "Change Password",
+    };
 
     public ApplicantBoundary(Scanner scanner, MainController mainController, User currentUser) {
         // Ensure the currentUser is indeed an Applicant
@@ -24,61 +38,31 @@ public class ApplicantBoundary extends BaseBoundary {
     }
 
     @Override
-    protected void displayMenu() {
-        System.out.println("\n--- Applicant Menu (" + currentUser.getName() + " | " + currentUser.getNric() + ") ---");
-        System.out.println("1. View Available BTO Projects");
-        System.out.println("2. Apply for Project");
-        System.out.println("3. View My Application Status");
-        System.out.println("4. Request Application Withdrawal");
-        System.out.println("5. Create Enquiry");
-        System.out.println("6. View My Enquiries");
-        System.out.println("7. Edit My Enquiry");
-        System.out.println("8. Delete My Enquiry");
-        System.out.println("9. Change Password");
-        System.out.println("10. Logout");
+    protected String[] getMenuOptions() {
+        return menuOptions;
     }
 
     @Override
     protected boolean processCommandOption(int choice) {
         boolean continueLoop = true;
         switch (choice) {
-            case 1:
-                handleViewAvailableProjects();
-                break;
-            case 2:
-                handleApplyForProject();
-                break;
-            case 3:
-                handleViewMyApplications();
-                break;
-            case 4:
-                 handleRequestWithdrawal();
-                 break;
-            case 5:
-                 handleCreateEnquiry();
-                 break;
-            case 6:
-                 handleViewMyEnquiries();
-                 break;
-            case 7:
-                 handleEditMyEnquiry();
-                 break;
-            case 8:
-                 handleDeleteMyEnquiry();
-                 break;
-            case 9:
+            case 0 -> { System.out.println("Logging out..."); continueLoop = false; }
+            case 1 -> handleViewAvailableProjects();
+            case 2 -> handleApplyForProject();
+            case 3 -> handleViewMyApplications();
+            case 4 -> handleRequestWithdrawal();
+            case 5 -> handleCreateEnquiry();
+            case 6 -> handleViewMyEnquiries();
+            case 7 -> handleEditMyEnquiry();
+            case 8 -> handleDeleteMyEnquiry();
+            case 9 -> {
                 boolean changed = handleChangePassword(); // Use inherited helper method
                 if (changed){
                     System.out.println("Password change process completed. For security, please log in again.");
                     continueLoop = false; // <-- Set to false to exit menu loop and force re-login
                 }
-                break;
-            case 10:
-                System.out.println("Logging out...");
-                continueLoop = false; // Signal to exit the loop
-                break;
-            default:
-                System.out.println("Invalid choice. Please try again.");
+            }
+            default -> System.out.println("Invalid choice. Please try again.");
         }
         return continueLoop;
     }

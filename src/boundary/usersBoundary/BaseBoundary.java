@@ -1,12 +1,14 @@
 package boundary.usersBoundary;
 
+import java.util.Date;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+
 import controller.MainController;
 import entities.user.User;
 import entities.project.FlatType;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
+import utilities.ui.MenuBuilder;
 
 public abstract class BaseBoundary {
     protected Scanner scanner;
@@ -23,9 +25,9 @@ public abstract class BaseBoundary {
     }
 
     /**
-     * Displays the menu specific to this boundary.
+     * Stores the menu options specific to this boundary.
      */
-    protected abstract void displayMenu();
+    protected abstract String[] getMenuOptions();
 
     /**
      * Processes the user's menu choice.
@@ -149,9 +151,20 @@ public abstract class BaseBoundary {
     public void runMenuLoop() {
         boolean keepRunning = true;
         while (keepRunning) {
-            System.out.println(); // Add a blank line for spacing
-            displayMenu();
-            int choice = getUserChoice("Enter your choice: ");
+            int choice = MenuBuilder.create()
+                .setHeader(
+                    String.format(
+                        "Welcome, %s (%s)!", 
+                        currentUser.getName(), 
+                        currentUser.getNric()
+                    ), 
+                    "",
+                    String.format("%s DASHBOARD", currentUser.getRole()).replaceAll("_"," ")
+                )
+                .setOptions(getMenuOptions())
+                .setFooter("Logout")
+                .render();
+            
             if (choice != -1) { // Only process valid integer inputs
                 // Add a separator line before processing output
                 System.out.println("------------------------------------------");

@@ -17,6 +17,27 @@ import java.util.Collections;
 import java.util.Map;
 
 public class HdbOfficerBoundary extends BaseBoundary {
+    private static final String[] menuOptions = {
+        "#Officer Functions",
+        "View Projects Assigned/Handled",
+        "Register for Project Team",
+        "View My Registration Status",
+        "Process Flat Booking for Applicant",
+        "Generate Booking Receipt",
+        "View Enquiries for Handled Projects",
+        "Reply to Enquiry",
+        "#Applicant Functions",
+        "View Available BTO Projects (Applicant View)",
+        "Apply for Project (as Applicant)",
+        "View My Application Status (as Applicant)",
+        "Request Application Withdrawal (as Applicant)",
+        "Create Enquiry (as Applicant)",
+        "View My Enquiries (as Applicant)",
+        "Edit My Enquiry (as Applicant)",
+        "Delete My Enquiry (as Applicant)",
+        "#General",
+        "Change Password",
+    };
 
     public HdbOfficerBoundary(Scanner scanner, MainController mainController, User currentUser) {
         super(scanner, mainController, (HdbOfficer) currentUser);
@@ -27,61 +48,41 @@ public class HdbOfficerBoundary extends BaseBoundary {
     }
 
     @Override
-    protected void displayMenu() {
-        System.out.println("\n--- HDB Officer Menu (" + currentUser.getName() + " | " + currentUser.getNric() + ") ---");
-        System.out.println("== Officer Functions ==");
-        System.out.println(" 1. View Projects Assigned/Handled");
-        System.out.println(" 2. Register for Project Team");
-        System.out.println(" 3. View My Registration Status");
-        System.out.println(" 4. Process Flat Booking for Applicant");
-        System.out.println(" 5. Generate Booking Receipt");
-        System.out.println(" 6. View Enquiries for Handled Projects");
-        System.out.println(" 7. Reply to Enquiry");
-        System.out.println("== Applicant Functions ==");
-        System.out.println(" 8. View Available BTO Projects (Applicant View)");
-        System.out.println(" 9. Apply for Project (as Applicant)");
-        System.out.println("10. View My Application Status (as Applicant)");
-        System.out.println("11. Request Application Withdrawal (as Applicant)");
-        System.out.println("12. Create Enquiry (as Applicant)");
-        System.out.println("13. View My Enquiries (as Applicant)");
-        System.out.println("14. Edit My Enquiry (as Applicant)");
-        System.out.println("15. Delete My Enquiry (as Applicant)");
-        System.out.println("== General ==");
-        System.out.println("16. Change Password");
-        System.out.println("17. Logout");
+    protected String[] getMenuOptions() {
+        return menuOptions;
     }
 
     @Override
     protected boolean processCommandOption(int choice) {
         boolean continueLoop = true;
         switch (choice) {
+            case 0 -> { System.out.println("Logging out..."); continueLoop = false; }
             // Officer Functions
-            case 1: handleViewHandledProjects(); break;
-            case 2: handleRegisterForProject(); break;
-            case 3: handleViewMyRegistrations(); break;
-            case 4: handleProcessFlatBooking(); break;
-            case 5: handleGenerateReceipt(); break;
-            case 6: handleViewHandledEnquiries(); break;
-            case 7: handleReplyToEnquiry(); break;
+            case 1 -> handleViewHandledProjects();
+            case 2 -> handleRegisterForProject();
+            case 3 -> handleViewMyRegistrations();
+            case 4 -> handleProcessFlatBooking();
+            case 5 -> handleGenerateReceipt();
+            case 6 -> handleViewHandledEnquiries();
+            case 7 -> handleReplyToEnquiry();
             // Applicant Functions (Delegate to HdbOfficerController which calls ApplicantController)
-            case 8: handleViewAvailableProjectsAsApplicant(); break;
-            case 9: handleApplyForProjectAsApplicant(); break;
-            case 10: handleViewMyApplicationsAsApplicant(); break;
-            case 11: handleRequestWithdrawalAsApplicant(); break;
-            case 12: handleCreateEnquiryAsApplicant(); break;
-            case 13: handleViewMySubmittedEnquiries(); break;
-            case 14: handleEditMyEnquiryAsApplicant(); break;
-            case 15: handleDeleteMyEnquiryAsApplicant(); break;
+            case 8 -> handleViewAvailableProjectsAsApplicant();
+            case 9 -> handleApplyForProjectAsApplicant();
+            case 10 -> handleViewMyApplicationsAsApplicant();
+            case 11 -> handleRequestWithdrawalAsApplicant();
+            case 12 -> handleCreateEnquiryAsApplicant();
+            case 13 -> handleViewMySubmittedEnquiries();
+            case 14 -> handleEditMyEnquiryAsApplicant();
+            case 15 -> handleDeleteMyEnquiryAsApplicant();
             // General
-            case 16:                 
-            boolean changed = handleChangePassword(); // Use inherited helper method
-            if (changed){
-                System.out.println("Password change process completed. For security, please log in again.");
-                continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+            case 16 -> {              
+                boolean changed = handleChangePassword(); // Use inherited helper method
+                if (changed){
+                    System.out.println("Password change process completed. For security, please log in again.");
+                    continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+                }
             }
-            break;
-            case 17: System.out.println("Logging out..."); continueLoop = false; break;
-            default: System.out.println("Invalid choice.");
+            default -> System.out.println("Invalid choice. Please try again.");
         }
         return continueLoop;
     }
