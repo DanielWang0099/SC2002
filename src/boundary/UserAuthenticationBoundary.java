@@ -19,19 +19,22 @@ public class UserAuthenticationBoundary {
      * @return Optional<User> containing the logged-in user if successful, empty otherwise.
      */
     public Optional<User> promptLogin() {
-        System.out.println("\n--- User Login ---");
+        System.out.println("\n========================================");
+        System.out.println("              User Login                ");
+        System.out.println("========================================");
+
         String nric = getStringInput("Enter NRIC: ");
-        // Consider Console.readPassword() if running in a real console for security
         String password = getStringInput("Enter Password: ");
 
         Optional<User> userOpt = mainController.getAuthController().login(nric, password);
 
+        System.out.println("----------------------------------------");
         if (userOpt.isPresent()) {
             System.out.println("Login Successful! Welcome " + userOpt.get().getName());
         } else {
-            // Error messages are printed by the AuthController
             System.out.println("Login Failed.");
         }
+        System.out.println("========================================");
         return userOpt;
     }
 

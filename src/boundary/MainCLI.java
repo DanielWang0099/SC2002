@@ -116,6 +116,10 @@ public class MainCLI {
      * @param user The logged-in user.
      */
     private void dispatchToUserBoundary(User user) {
+        System.out.println("\n========================================");
+        System.out.println(" User Role Dispatch ");
+        System.out.println("========================================");
+
         BaseBoundary userBoundary = null;
 
          // Check user object and role are not null before switching
@@ -127,23 +131,29 @@ public class MainCLI {
 
         switch (user.getRole()) {
             case APPLICANT:
+                System.out.println("\n--- Applicant Menu ---");
                 userBoundary = new ApplicantBoundary(scanner, mainController, user);
                 break;
             case HDB_OFFICER:
+                System.out.println("\n--- HDB Officer Menu ---");
                 userBoundary = new HdbOfficerBoundary(scanner, mainController, user);
                 break;
             case HDB_MANAGER:
+                System.out.println("\n--- HDB Manager Menu ---");
                 userBoundary = new HdbManagerBoundary(scanner, mainController, user);
                 break;
             default:
-                // This case should ideally not be reached if Role enum is used correctly
+                System.out.println("\n--- Unknown Role ---");
                 System.out.println("Error: Unknown user role encountered [" + user.getRole() + "]. Logging out.");
                 return; // Exit dispatch method
         }
 
         if (userBoundary != null) {
             System.out.println("\nRedirecting to " + user.getRole() + " menu...");
-            userBoundary.runMenuLoop(); // Start the interaction loop for the user's role
+            userBoundary.runMenuLoop();
+            System.out.println("\n========================================");
+            System.out.println(" End of " + user.getRole() + " Session ");
+            System.out.println("========================================");
         }
     }
 

@@ -29,70 +29,93 @@ public class HdbManagerBoundary extends BaseBoundary {
 
     @Override
     protected void displayMenu() {
-        System.out.println("\n--- HDB Manager Menu (" + currentUser.getName() + " | " + currentUser.getNric() + ") ---");
-        System.out.println("== Project Management ==");
+        System.out.println("\n==================================================");
+        System.out.println("             HDB Manager Main Menu");
+        System.out.println(" User: " + currentUser.getName() + " | NRIC: " + currentUser.getNric());
+        System.out.println("==================================================");
+
+        System.out.println("\n--- Project Management ---");
         System.out.println(" 1. Create New BTO Project");
         System.out.println(" 2. Edit Existing BTO Project");
         System.out.println(" 3. Delete Existing BTO Project");
         System.out.println(" 4. Toggle Project Visibility");
         System.out.println(" 5. View All Projects");
         System.out.println(" 6. View My Managed Projects");
-        System.out.println("== Registration Management ==");
+
+        System.out.println("\n--- Registration Management ---");
         System.out.println(" 7. View Pending Officer Registrations");
         System.out.println(" 8. Process Officer Registration (Approve/Reject)");
-        System.out.println("== Application Management ==");
+
+        System.out.println("\n--- Application Management ---");
         System.out.println(" 9. View Pending BTO Applications");
         System.out.println("10. Process BTO Application (Approve/Reject)");
         System.out.println("11. View Pending Withdrawal Requests");
         System.out.println("12. Process Withdrawal Request (Approve/Reject)");
-        System.out.println("== Enquiry Management ==");
+
+        System.out.println("\n--- Enquiry Management ---");
         System.out.println("13. View All Enquiries");
         System.out.println("14. View Enquiries for My Projects");
         System.out.println("15. Reply to Enquiry");
-        System.out.println("== Reporting ==");
+
+        System.out.println("\n--- Reporting ---");
         System.out.println("16. Generate Booking Report");
-        System.out.println("== General ==");
+
+        System.out.println("\n--- General ---");
         System.out.println("17. Change Password");
         System.out.println("18. Logout");
+
+        System.out.println("==================================================");
     }
 
     @Override
     protected boolean processCommandOption(int choice) {
-         boolean continueLoop = true;
-         switch (choice) {
-             // Project Management
-             case 1: handleCreateProject(); break;
-             case 2: handleEditProject(); break;
-             case 3: handleDeleteProject(); break;
-             case 4: handleToggleVisibility(); break;
-             case 5: handleViewAllProjects(); break;
-             case 6: handleViewMyProjects(); break;
-             // Registration Management
-             case 7: handleViewPendingOfficerRegs(); break;
-             case 8: handleProcessOfficerReg(); break;
-             // Application Management
-             case 9: handleViewPendingBtoApps(); break;
-             case 10: handleProcessBtoApp(); break;
-             case 11: handleViewPendingWithdrawals(); break;
-             case 12: handleProcessWithdrawal(); break;
-             // Enquiry Management
-             case 13: handleViewAllEnquiries(); break;
-             case 14: handleViewManagedEnquiries(); break;
-             case 15: handleReplyToEnquiry(); break;
-             // Reporting
-             case 16: handleGenerateReport(); break;
-             // General
-             case 17:
-             boolean changed = handleChangePassword(); // Use inherited helper method
-             if (changed){
-                 System.out.println("Password change process completed. For security, please log in again.");
-                 continueLoop = false; // <-- Set to false to exit menu loop and force re-login
-             }
-             break;
-             case 18: System.out.println("Logging out..."); continueLoop = false; break;
-             default: System.out.println("Invalid choice.");
-         }
-         return continueLoop;
+        System.out.println("\n--------------------------------------------------");
+        switch (choice) {
+            // Project Management
+            case 1: System.out.println("Section: Create New BTO Project"); handleCreateProject(); break;
+            case 2: System.out.println("Section: Edit Existing BTO Project"); handleEditProject(); break;
+            case 3: System.out.println("Section: Delete Existing BTO Project"); handleDeleteProject(); break;
+            case 4: System.out.println("Section: Toggle Project Visibility"); handleToggleVisibility(); break;
+            case 5: System.out.println("Section: View All Projects"); handleViewAllProjects(); break;
+            case 6: System.out.println("Section: View My Managed Projects"); handleViewMyProjects(); break;
+
+            // Registration Management
+            case 7: System.out.println("Section: View Pending Officer Registrations"); handleViewPendingOfficerRegs(); break;
+            case 8: System.out.println("Section: Process Officer Registration"); handleProcessOfficerReg(); break;
+
+            // Application Management
+            case 9: System.out.println("Section: View Pending BTO Applications"); handleViewPendingBtoApps(); break;
+            case 10: System.out.println("Section: Process BTO Application"); handleProcessBtoApp(); break;
+            case 11: System.out.println("Section: View Pending Withdrawal Requests"); handleViewPendingWithdrawals(); break;
+            case 12: System.out.println("Section: Process Withdrawal Request"); handleProcessWithdrawal(); break;
+
+            // Enquiry Management
+            case 13: System.out.println("Section: View All Enquiries"); handleViewAllEnquiries(); break;
+            case 14: System.out.println("Section: View Enquiries for My Projects"); handleViewManagedEnquiries(); break;
+            case 15: System.out.println("Section: Reply to Enquiry"); handleReplyToEnquiry(); break;
+
+            // Reporting
+            case 16: System.out.println("Section: Generate Booking Report"); handleGenerateReport(); break;
+
+            // General
+            case 17:
+                System.out.println("Section: Change Password");
+                boolean changed = handleChangePassword();
+                if (changed) {
+                    System.out.println("Password change process completed. For security, please log in again.");
+                    System.out.println("--------------------------------------------------");
+                    return false;
+                }
+                break;
+            case 18:
+                System.out.println("Logging out...");
+                System.out.println("--------------------------------------------------");
+                return false;
+            default:
+                System.out.println("Invalid choice.");
+        }
+        System.out.println("--------------------------------------------------");
+        return true;
     }
 
     // --- Action Handlers ---
@@ -295,34 +318,6 @@ public class HdbManagerBoundary extends BaseBoundary {
               System.out.println("Deletion cancelled.");
          }
      }
-
-/*     private void handleToggleVisibility() {
-         System.out.println("--- Toggle Project Visibility ---");
-         System.out.println("Projects you manage:");
-         List<Project> myProjects = mainController.getHdbManagerController().viewMyProjects(currentManager());
-         if(!displayProjectsList(myProjects, true)) return; // Show visibility status
-
-         String projectName = getStringInput("Enter name of project to toggle visibility for (or 'cancel'): ");
-         if(projectName.equalsIgnoreCase("cancel")) return;
-
-         Optional<Project> projectOpt = myProjects.stream().filter(p -> p.getName().equals(projectName)).findFirst();
-         if (projectOpt.isEmpty()) {
-             System.out.println("Project not found or you do not manage it.");
-             return;
-         }
-         Project project = projectOpt.get();
-
-         boolean currentVisibility = project.isVisible();
-         boolean makeVisible = getYesNoInput("Project is currently " + (currentVisibility ? "Visible" : "Hidden") + ". Set visibility to " + (!currentVisibility ? "Visible" : "Hidden") + "?");
-
-         if (makeVisible = true) { // Only proceed if toggling
-             boolean success = mainController.getHdbManagerController().toggleProjectVisibility(currentManager(), projectName, makeVisible);
-             if (success) System.out.println("Visibility updated."); else System.out.println("Failed to update visibility.");
-         } else {
-            
-              System.out.println("Visibility not changed.");
-         }
-    } */
 
     private void handleToggleVisibility() {
         System.out.println("--- Toggle Project Visibility ---");
