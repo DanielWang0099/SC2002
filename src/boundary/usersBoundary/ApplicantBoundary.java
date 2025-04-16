@@ -25,7 +25,10 @@ public class ApplicantBoundary extends BaseBoundary {
 
     @Override
     protected void displayMenu() {
-        System.out.println("\n--- Applicant Menu (" + currentUser.getName() + " | " + currentUser.getNric() + ") ---");
+        System.out.println("\n==================================================");
+        System.out.println("           Applicant Main Menu");
+        System.out.println(" User: " + currentUser.getName() + " | NRIC: " + currentUser.getNric());
+        System.out.println("==================================================");
         System.out.println("1. View Available BTO Projects");
         System.out.println("2. Apply for Project");
         System.out.println("3. View My Application Status");
@@ -36,51 +39,63 @@ public class ApplicantBoundary extends BaseBoundary {
         System.out.println("8. Delete My Enquiry");
         System.out.println("9. Change Password");
         System.out.println("10. Logout");
+        System.out.println("==================================================");
     }
 
     @Override
     protected boolean processCommandOption(int choice) {
-        boolean continueLoop = true;
+        System.out.println("\n--------------------------------------------------");
         switch (choice) {
             case 1:
+                System.out.println("Section: View Available BTO Projects");
                 handleViewAvailableProjects();
                 break;
             case 2:
+                System.out.println("Section: Apply for Project");
                 handleApplyForProject();
                 break;
             case 3:
+                System.out.println("Section: View My Application Status");
                 handleViewMyApplications();
                 break;
             case 4:
-                 handleRequestWithdrawal();
-                 break;
+                System.out.println("Section: Request Application Withdrawal");
+                handleRequestWithdrawal();
+                break;
             case 5:
-                 handleCreateEnquiry();
-                 break;
+                System.out.println("Section: Create Enquiry");
+                handleCreateEnquiry();
+                break;
             case 6:
-                 handleViewMyEnquiries();
-                 break;
+                System.out.println("Section: View My Enquiries");
+                handleViewMyEnquiries();
+                break;
             case 7:
-                 handleEditMyEnquiry();
-                 break;
+                System.out.println("Section: Edit My Enquiry");
+                handleEditMyEnquiry();
+                break;
             case 8:
-                 handleDeleteMyEnquiry();
-                 break;
+                System.out.println("Section: Delete My Enquiry");
+                handleDeleteMyEnquiry();
+                break;
             case 9:
-                boolean changed = handleChangePassword(); // Use inherited helper method
-                if (changed){
+                System.out.println("Section: Change Password");
+                boolean changed = handleChangePassword();
+                if (changed) {
                     System.out.println("Password change process completed. For security, please log in again.");
-                    continueLoop = false; // <-- Set to false to exit menu loop and force re-login
+                    System.out.println("--------------------------------------------------");
+                    return false;
                 }
                 break;
             case 10:
                 System.out.println("Logging out...");
-                continueLoop = false; // Signal to exit the loop
-                break;
+                System.out.println("--------------------------------------------------");
+                return false;
             default:
                 System.out.println("Invalid choice. Please try again.");
         }
-        return continueLoop;
+        System.out.println("--------------------------------------------------");
+        return true;
     }
 
     // --- Action Handlers ---
