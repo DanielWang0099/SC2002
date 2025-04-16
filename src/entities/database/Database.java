@@ -1,5 +1,8 @@
 package entities.database;
 
+import java.util.List;
+import java.util.Optional;
+
 import entities.database.repositories.*;
 import entities.database.repositories.documentsRepositories.ApplicationRepository;
 import entities.database.repositories.documentsRepositories.EnquiryRepository;
@@ -8,6 +11,10 @@ import entities.database.repositories.documentsRepositories.WithdrawalRepository
 import entities.database.repositories.usersRepositories.ApplicantRepository;
 import entities.database.repositories.usersRepositories.HdbManagerRepository;
 import entities.database.repositories.usersRepositories.HdbOfficerRepository;
+import entities.documents.DocumentStatus;
+import entities.documents.approvableDocuments.ProjectApplication;
+import entities.project.FlatType;
+import entities.project.Project;
 
 // Import User model classes when created
 
@@ -82,6 +89,15 @@ public final class Database { // final keyword prevents subclassing
 
             System.out.println("Database Facade: Phase 2 Complete. All data loading initiated.");
 
+            // --- Phase 3: Reconcile Data (NEW STEP) ---
+            System.out.println("Database Facade: Phase 3 - Reconciling Data...");
+            reconcileRemainingUnits(); // Call the new reconciliation method
+            System.out.println("Database Facade: Phase 3 Complete. Reconciliation finished.");
+
+
+            System.out.println("Database Facade: All data loading and reconciliation initiated.");
+
+            
         } catch (Exception e) {
             System.err.println("CRITICAL ERROR during data loading phase: " + e.getMessage());
             e.printStackTrace();
@@ -106,6 +122,41 @@ public final class Database { // final keyword prevents subclassing
     // Optional: Add getters for specific repos if frequently needed directly
     // public static ApplicationRepository getApplicationRepo() { return applicationRepository; }
 
+    private static void reconcileRemainingUnits() {
+        System.out.println("Reconciling remaining flat units based on booked applications...");
+        int adjustedCount = 0;
+        // Get all applications directly from its repository
+        List<ProjectApplication> allApplications = applicationRepository.findAll(); // Use direct reference
+
+        for (ProjectApplication app : allApplications) {
+            if (app.getStatus() == DocumentStatus.BOOKED) {
+                FlatType bookedType = app.getBookedFlatType(); // Assumes getter exists
+                String projectName = app.getProjectName(); // Assumes getter exists
+
+                if (bookedType != null && projectName != null) {
+                    Optional<Project> projectOpt = projectsRepository.findById(projectName); // Use direct reference
+                    if (projectOpt.isPresent()) {
+                        Project project = projectOpt.get();
+                        // Decrement the unit for the loaded booked application
+                        // Note: decrementRemainingUnit returns false if already 0, which might
+                        // indicate inconsistency, but we proceed anyway for loading state.
+                        boolean decremented = project.decrementRemainingUnit(bookedType);
+                        if (decremented) {
+                             adjustedCount++;
+                            // Optional log: System.out.println("Reconciled booking: App " + app.getDocumentID() + " decremented " + bookedType + " for project " + projectName);
+                        } else {
+                             System.err.println("Reconciliation Warning: Could not decrement unit " + bookedType + " for project " + projectName + " based on booked app " + app.getDocumentID() + ". Remaining count might already be zero.");
+                        }
+                    } else {
+                         System.err.println("Reconciliation Warning: Project '" + projectName + "' not found for booked application " + app.getDocumentID());
+                    }
+                } else {
+                     System.err.println("Reconciliation Warning: Booked application " + app.getDocumentID() + " is missing booked flat type or project name.");
+                }
+            }
+        }
+        System.out.println("Finished reconciling units. Decremented units for " + adjustedCount + " booked applications.");
+    }
 
     // --- saveAllData method remains the same ---
     public static void saveAllData() {

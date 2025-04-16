@@ -135,6 +135,45 @@ public class HdbOfficerBoundary extends BaseBoundary {
 
     private void handleProcessFlatBooking() {
          System.out.println("--- Process Flat Booking ---");
+
+         List<Project> handledProjects = mainController.getHdbOfficerController().viewHandledProjects(currentOfficer());
+         Project projectToManage = null;
+ 
+         if (handledProjects.isEmpty()) {
+             System.out.println("You are not currently assigned to handle any projects.");
+             return;
+         } else if (handledProjects.size() == 1) {
+             projectToManage = handledProjects.get(0);
+             System.out.println("Processing bookings for Project: " + projectToManage.getName());
+         } else {
+             System.out.println("Projects you are handling:");
+             displayProjectsList(handledProjects, false); // Show simplified list for selection
+             String projectNameChoice = getStringInput("Enter the Project Name you are processing bookings for: ");
+             Optional<Project> projectOpt = handledProjects.stream()
+                                                .filter(p -> p.getName().equalsIgnoreCase(projectNameChoice))
+                                                .findFirst();
+             if (projectOpt.isEmpty()) {
+                 System.out.println("Invalid project selection.");
+                 return;
+             }
+             projectToManage = projectOpt.get();
+         }
+ 
+         // 2. Fetch and Filter Applications for the Selected Project
+         System.out.println("\nFetching APPROVED applications for project '" + projectToManage.getName() + "'...");
+         List<ProjectApplication> allAppsForProject = Database.getDocumentsRepository()
+                                                         .getApplicationRepository()
+                                                         .findByProjectId(projectToManage.getName()); // Use existing repo method
+ 
+         List<ProjectApplication> approvedApps = allAppsForProject.stream()
+                 .filter(app -> app.getStatus() == DocumentStatus.APPROVED)
+                 .collect(Collectors.toList());
+ 
+         // 3. Display Approved Applications
+         if (!displayApplicationsList(approvedApps)) { // Use the existing display helper
+             System.out.println("There are no applications currently approved and awaiting booking for this project.");
+             return;
+         }
          String applicantNric = getStringInput("Enter Applicant's NRIC to process booking for: ");
          // Find the applicant's *approved* application
          List<ProjectApplication> apps = Database.getDocumentsRepository().getApplicationRepository()
@@ -146,6 +185,7 @@ public class HdbOfficerBoundary extends BaseBoundary {
              System.out.println("No approved application found for NRIC " + applicantNric);
              return;
          }
+
          ProjectApplication applicationToBook;
          if (apps.size() == 1) {
              applicationToBook = apps.get(0);
@@ -196,11 +236,19 @@ public class HdbOfficerBoundary extends BaseBoundary {
             }
          }
 
-
          if (getYesNoInput("Confirm booking of " + chosenType + " for Application " + applicationToBook.getDocumentID() + "?")) {
              boolean success = mainController.getHdbOfficerController().processFlatBooking(currentOfficer(), applicationToBook, chosenType);
              if (success) {
                   System.out.println("Flat booking processed successfully.");
+                  // New: Ask user whether to generate receipt for the booking
+                  if (getYesNoInput("Generate receipt for this booking?")) {
+                      String receipt = mainController.getHdbOfficerController().generateBookingReceipt(currentOfficer(), applicationToBook);
+                      if (receipt != null) {
+                          System.out.println(receipt);
+                      } else {
+                          System.out.println("Receipt generation failed.");
+                      }
+                  }
              } else {
                    System.out.println("Flat booking failed."); // Error from controller
              }
@@ -211,18 +259,74 @@ public class HdbOfficerBoundary extends BaseBoundary {
 
     private void handleGenerateReceipt() {
         System.out.println("--- Generate Booking Receipt ---");
-        String appId = getStringInput("Enter Application ID of the booked flat: ");
-        Optional<ProjectApplication> appOpt = Database.getDocumentsRepository().getApplicationRepository().findById(appId);
 
-        if (appOpt.isPresent() && appOpt.get().getStatus() == DocumentStatus.BOOKED) {
-            String receipt = mainController.getHdbOfficerController().generateBookingReceipt(currentOfficer(), appOpt.get());
-            if (receipt != null) {
-                System.out.println(receipt);
-            } else {
-                 System.out.println("Failed to generate receipt."); // Error from controller
+        List<Project> handledProjects = mainController.getHdbOfficerController().viewHandledProjects(currentOfficer());
+        Project projectToManage = null;
+
+        if (handledProjects.isEmpty()) {
+            System.out.println("You are not currently assigned to handle any projects.");
+            return;
+        } else if (handledProjects.size() == 1) {
+            projectToManage = handledProjects.get(0);
+            System.out.println("Processing bookings for Project: " + projectToManage.getName());
+        } else {
+            System.out.println("Projects you are handling:");
+            displayProjectsList(handledProjects, false);
+            String projectNameChoice = getStringInput("Enter the Project Name you are processing bookings for: ");
+            Optional<Project> projectOpt = handledProjects.stream()
+                                               .filter(p -> p.getName().equalsIgnoreCase(projectNameChoice))
+                                               .findFirst();
+            if (projectOpt.isEmpty()) {
+                System.out.println("Invalid project selection.");
+                return;
+            }
+            projectToManage = projectOpt.get();
+        }
+
+        System.out.println("\nFetching BOOKED applications for project '" + projectToManage.getName() + "'...");
+        List<ProjectApplication> allAppsForProject = Database.getDocumentsRepository()
+                                                        .getApplicationRepository()
+                                                        .findByProjectId(projectToManage.getName());
+        List<ProjectApplication> bookedApps = allAppsForProject.stream()
+                .filter(app -> app.getStatus() == DocumentStatus.BOOKED)
+                .collect(Collectors.toList());
+
+        if (bookedApps.isEmpty()) {
+             System.out.println("There are no applications booked for this project.");
+             return;
+        }
+
+        // New: Prompt officer for receipt generation option
+        boolean generateAll = getYesNoInput("Generate receipt for all bookings in this project? (Otherwise, single booking receipt)");
+
+        if (generateAll) {
+            System.out.println("Generating receipts for all booked applications in project '" + projectToManage.getName() + "'...");
+            for (ProjectApplication app : bookedApps) {
+                String receipt = mainController.getHdbOfficerController().generateBookingReceipt(currentOfficer(), app);
+                if (receipt != null) {
+                    System.out.println(receipt);
+                } else {
+                    System.out.println("Failed to generate receipt for Application ID: " + app.getDocumentID());
+                }
+                System.out.println("-------------------------------------");
             }
         } else {
-            System.out.println("Application ID not found or application is not in BOOKED state.");
+            if (!displayApplicationsList(bookedApps)) {
+                System.out.println("There are no applications booked available for receipt.");
+                return;
+            }
+            String appId = getStringInput("Enter Application ID of the booked flat: ");
+            Optional<ProjectApplication> appOpt = Database.getDocumentsRepository().getApplicationRepository().findById(appId);
+            if (appOpt.isPresent() && appOpt.get().getStatus() == DocumentStatus.BOOKED) {
+                String receipt = mainController.getHdbOfficerController().generateBookingReceipt(currentOfficer(), appOpt.get());
+                if (receipt != null) {
+                    System.out.println(receipt);
+                } else {
+                    System.out.println("Failed to generate receipt.");
+                }
+            } else {
+                System.out.println("Application ID not found or application is not in BOOKED state.");
+            }
         }
     }
 
@@ -551,4 +655,4 @@ public class HdbOfficerBoundary extends BaseBoundary {
                 return ProjectController.SORT_BY_NAME; // Default
         }
     }
-}   
+}

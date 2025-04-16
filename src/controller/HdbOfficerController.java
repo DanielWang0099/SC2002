@@ -116,12 +116,29 @@ public class HdbOfficerController {
              System.err.println("Booking Error: Invalid input.");
              return false;
          }
+         Applicant applicant = (Applicant) application.getSubmitter();
+         if (applicant == null) { System.err.println("Booking Error: Applicant missing from application."); return false; }
+
 
          // 1. Validate Application Status (Must be APPROVED - or whatever status signifies "invited to select")
          if (application.getStatus() != DocumentStatus.APPROVED) { // Assuming APPROVED means ready for booking
               System.err.println("Booking Error: Application " + application.getDocumentID() + " is not in the correct state ("+application.getStatus()+") for booking.");
               return false;
          }
+
+                  // *** ADDED: Check if this applicant ALREADY HAS another booked flat ***
+        Optional<ProjectApplication> existingBooking = Database.getDocumentsRepository()
+                  .getApplicationRepository()
+                  .findBookedApplicationByApplicantNric(applicant.getNric());
+ 
+
+        if (existingBooking.isPresent() && !existingBooking.get().getDocumentID().equals(application.getDocumentID())) {
+               System.err.println("Booking Error: Applicant " + applicant.getNric() +
+                                  " already has a booked flat (Application ID: " + existingBooking.get().getDocumentID() +
+                                  " for Project: " + existingBooking.get().getProjectName() +
+                                  "). Cannot book another flat.");
+              return false; // Cannot book if already booked elsewhere
+        }
 
          // 2. Find the Project
          Optional<Project> projectOpt = Database.getProjectsRepository().findById(application.getProjectName());
@@ -139,7 +156,6 @@ public class HdbOfficerController {
          }
 
           // 4. Check Flat Type Eligibility (Redundant check? ApplicantController should ensure initial eligibility)
-          Applicant applicant = (Applicant) application.getSubmitter();
           if (!applicantController.checkEligibility(applicant, chosenFlatType)) {
               System.err.println("Booking Error: Applicant " + applicant.getNric() + " is not eligible for flat type " + chosenFlatType);
               return false;
@@ -194,19 +210,25 @@ public class HdbOfficerController {
                System.err.println("Receipt Error: Application not found or not in BOOKED state.");
                return null;
           }
-          // TODO: Check officer is assigned to the project for authorisation?
-
-          User applicant = application.getSubmitter();
+          // Added: Retrieve project and verify officer is assigned to it
           Optional<Project> projectOpt = Database.getProjectsRepository().findById(application.getProjectName());
-
-          if (applicant == null || projectOpt.isEmpty()) {
-               System.err.println("Receipt Error: Applicant or Project data missing for application " + application.getDocumentID());
+          if (projectOpt.isEmpty()) {
+               System.err.println("Receipt Error: Project data missing for application " + application.getDocumentID());
                return null;
           }
           Project project = projectOpt.get();
-          // TODO: Get booked flat type (needs to be stored in ProjectApplication)
-          // FlatType bookedType = application.getBookedFlatType(); // Requires getter
-
+          if (project.getAssignedOfficers().stream().noneMatch(o -> o.equals(officer))) {
+              System.err.println("Receipt Error: Officer " + officer.getNric() + " is not assigned to project '" + project.getName() + "'.");
+              return null;
+          }
+          User applicant = application.getSubmitter();
+          if (applicant == null) {
+               System.err.println("Receipt Error: Applicant data missing for application " + application.getDocumentID());
+               return null;
+          }
+          // Added: Retrieve booked flat type
+          FlatType bookedType = application.getBookedFlatType();
+          
           // Format the receipt string
           StringBuilder receipt = new StringBuilder();
           receipt.append("\n--- BTO Flat Booking Receipt ---");
@@ -218,10 +240,9 @@ public class HdbOfficerController {
           receipt.append("\n--- Project Details ---");
           receipt.append("\nProject Name: ").append(project.getName());
           receipt.append("\nNeighbourhood: ").append(project.getNeighbourhood());
-          // receipt.append("\nBooked Flat Type: ").append(bookedType); // Add once available
-          receipt.append("\nBooking confirmed on: ").append(application.getLastModifiedDate()); // Date status changed to booked
+          receipt.append("\nBooked Flat Type: ").append(bookedType);
+          receipt.append("\nBooking confirmed on: ").append(application.getLastModifiedDate());
           receipt.append("\n--- End of Receipt ---");
-
           return receipt.toString();
      }
 

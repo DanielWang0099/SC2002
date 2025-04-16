@@ -132,15 +132,28 @@ public class Enquiry implements IReplyableDocument {
 
     @Override
     public boolean delete(User deleter) {
-       // Applicant can delete their enquiry if it's still in DRAFT
-        if (this.status == DocumentStatus.DRAFT && deleter.equals(this.submitter)) {
-            this.status = DocumentStatus.CLOSED; // Or a specific DELETED status
-             System.out.println("Enquiry " + documentID + " deleted by " + deleter.getNric());
-            // TODO: Remove from data store
-            return true;
+        // Check authorization: Only the original submitter can delete.
+        if (!deleter.equals(this.submitter)) {
+            System.err.println("Delete Error: User " + deleter.getNric() + " is not the submitter of enquiry " + getDocumentID());
+            return false;
         }
-         System.out.println("Deletion failed for " + documentID + ". Invalid status ("+this.status+") or deleter.");
-        return false;
+    
+        // --- UPDATED STATUS CHECK ---
+        // Allow deletion as long as it hasn't been REPLIED to or already CLOSED.
+        if (this.status == DocumentStatus.REPLIED || this.status == DocumentStatus.CLOSED) {
+            System.err.println("Delete Error: Enquiry " + getDocumentID() + " cannot be deleted because its status is " + this.status);
+            return false;
+        }
+        // --- -------------------- ---
+    
+        // Mark status as closed/deleted conceptually
+        // The actual removal from the repository is handled by the Controller/Repository call
+        this.status = DocumentStatus.CLOSED;
+        this.lastModifiedDate = LocalDateTime.now();
+        this.lastModifiedBy = deleter;
+        System.out.println("Enquiry " + documentID + " marked as deleted by " + deleter.getNric());
+        // Return true indicates the status was successfully updated in the object
+        return true;
     }
 
     @Override

@@ -4,11 +4,12 @@ import entities.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.Objects;
+import java.util.Optional;
 
+import entities.database.Database;
 import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
 import entities.project.*;
-
 
 public class ProjectApplication implements IApprovableDocument {
 
@@ -206,4 +207,8 @@ public class ProjectApplication implements IApprovableDocument {
          return false;
     }
 
+    public Project getProject() {
+        Optional<Project> projectOpt = Database.getProjectsRepository().findById(projectName);
+        return projectOpt.orElse(null);
+    }
 }

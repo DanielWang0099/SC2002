@@ -183,11 +183,9 @@ public class ApplicationRepository implements IRepository<ProjectApplication, St
      */
     public List<ProjectApplication> findByProjectId(String projectId) {
         System.out.println("ApplicationRepository: Finding applications for project " + projectId + " (Stub - Requires ProjectApplication <-> Project Link)");
-        // TODO: Implement filtering based on ProjectApplication having a getProject().getName() method
-        // return applicationMap.values().stream()
-        //         .filter(app -> app.getProject() != null && app.getProject().getName().equals(projectId))
-        //         .collect(Collectors.toList());
-        return new ArrayList<>(); // Placeholder
+        return applicationMap.values().stream()
+                 .filter(app -> app.getProject() != null && app.getProject().getName().equals(projectId))
+                 .collect(Collectors.toList());
     }
 
 private String formatDate(LocalDateTime ldt) {
@@ -209,4 +207,15 @@ private String formatDate(LocalDateTime ldt) {
          // Convert java.util.Date to LocalDateTime via Instant
          return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
      }
+
+     public Optional<ProjectApplication> findBookedApplicationByApplicantNric(String applicantNric) {
+        if (applicantNric == null || applicantNric.isBlank()) {
+            return Optional.empty();
+        }
+        return applicationMap.values().stream()
+                .filter(app -> app.getSubmitter() != null &&
+                               app.getSubmitter().getNric().equalsIgnoreCase(applicantNric) &&
+                               app.getStatus() == DocumentStatus.BOOKED)
+                .findFirst();
+    }
 }

@@ -93,6 +93,16 @@ public class ApplicantController {
             return null;
         }
 
+        Optional<ProjectApplication> existingBooking = Database.getDocumentsRepository()
+            .getApplicationRepository()
+            .findBookedApplicationByApplicantNric(applicant.getNric());
+        if (existingBooking.isPresent()) {
+            System.err.println("Application Error: Applicant " + applicant.getNric() +
+                            " already has a booked flat (Application ID: " + existingBooking.get().getDocumentID() +
+                            " for Project: " + existingBooking.get().getProjectName() + "). Cannot apply for a new project.");
+            return null; // Cannot apply if already booked
+        }
+
         // 3. *** ADDED: Strict Eligibility Check based on PDF Rules ***
         if (!isEligibleToApply(applicant, project)) {
              System.err.println("Application Error: Applicant " + applicant.getNric() +
@@ -295,7 +305,7 @@ public class ApplicantController {
             return false;
         }
         Enquiry enquiry = enquiryOpt.get();
-
+        
         // Authorisation & Status Check
          if (!enquiry.getSubmitter().equals(applicant)) {
              System.err.println("Enquiry Delete Error: Applicant " + applicant.getNric() + " did not submit this enquiry.");
