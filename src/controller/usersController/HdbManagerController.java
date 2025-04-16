@@ -1,4 +1,4 @@
-package controller;
+package controller.usersController;
 
 import entities.database.Database;
 import entities.project.*; // Project, FlatType, User, HdbManager, HdbOfficer etc.
@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.stream.*;
+
+import controller.ProjectController;
+
 import java.util.Map;
 
 public class HdbManagerController {

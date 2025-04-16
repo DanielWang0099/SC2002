@@ -18,7 +18,7 @@ import entities.project.*;
 public class ApplicantRepository implements IRepository<Applicant, String> {
 
     private final Map<String, Applicant> applicantMap = new ConcurrentHashMap<>();
-    private final String filename = "data/applicants.csv"; // Define filename
+    private final String filename = "data/users/applicants.csv"; // Define filename
 
     // Package-private constructor, managed by UsersRepository facade
     public ApplicantRepository() {}

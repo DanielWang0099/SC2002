@@ -1,4 +1,4 @@
-package controller;
+package controller.usersController;
 
 import entities.database.Database;
 import entities.project.*; // Project, FlatType, User, HdbManager, HdbOfficer etc.
@@ -9,6 +9,8 @@ import entities.user.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import controller.ProjectController;
 
 public class ApplicantController {
 
