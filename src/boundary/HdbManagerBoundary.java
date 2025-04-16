@@ -296,7 +296,7 @@ public class HdbManagerBoundary extends BaseBoundary {
          }
      }
 
-    private void handleToggleVisibility() {
+/*     private void handleToggleVisibility() {
          System.out.println("--- Toggle Project Visibility ---");
          System.out.println("Projects you manage:");
          List<Project> myProjects = mainController.getHdbManagerController().viewMyProjects(currentManager());
@@ -322,8 +322,63 @@ public class HdbManagerBoundary extends BaseBoundary {
             
               System.out.println("Visibility not changed.");
          }
-    }
+    } */
 
+    private void handleToggleVisibility() {
+        System.out.println("--- Toggle Project Visibility ---");
+        System.out.println("Projects you manage:");
+        // Ensure controller method signature matches if updated
+        List<Project> myProjects = mainController.getHdbManagerController()
+                                        .viewAllProjects(currentManager()); // Get unfiltered, sorted list
+
+       // Ensure display method shows current visibility
+       if(!displayProjectsList(myProjects, true)) { // Assuming this helper shows visibility
+            System.out.println("You do not manage any projects.");
+            return;
+       }
+
+        String projectName = getStringInput("Enter name of project to toggle visibility for (or 'cancel'): ");
+        if(projectName.equalsIgnoreCase("cancel")) {
+             System.out.println("Operation cancelled.");
+             return;
+        }
+
+        // Find the project reliably
+        Optional<Project> projectOpt = Database.getProjectsRepository().findById(projectName);
+
+        // Verify manager owns this project
+        if (projectOpt.isEmpty() || !projectOpt.get().getManager().equals(currentManager())) {
+            System.out.println("Project '" + projectName + "' not found or you do not manage it.");
+            return;
+        }
+        Project project = projectOpt.get();
+
+        // --- Corrected Logic ---
+        boolean currentVisibility = project.isVisible();
+        // Ask clearly if they want to change to the opposite state
+        boolean userWantsToToggle = getYesNoInput("Project '" + projectName + "' is currently " +
+                                                  (currentVisibility ? "Visible" : "Hidden") +
+                                                  ". Do you want to change it to " +
+                                                  (!currentVisibility ? "Visible" : "Hidden") + "?");
+
+        if (userWantsToToggle) {
+            // If user said YES, the desired new state is the opposite of the current one
+            boolean newState = !currentVisibility;
+            // Call the controller with the actual desired state
+            boolean success = mainController.getProjectController() // Use ProjectController for this action
+                                .toggleProjectVisibility(currentManager(), projectName, newState);
+
+            if (success) {
+                System.out.println("Project visibility successfully set to " + (newState ? "Visible" : "Hidden") + ".");
+            } else {
+                System.out.println("Failed to update project visibility."); // Error from controller
+            }
+        } else {
+            // If user said NO, do nothing
+            System.out.println("Visibility not changed.");
+        }
+        // --- End Corrected Logic ---
+   }
     private void handleViewAllProjects() {
         System.out.println("--- View All Projects ---");
         // --- Optional Filtering ---
