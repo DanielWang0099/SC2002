@@ -17,12 +17,10 @@ import controller.ProjectController;
 
 import java.util.Map;
 
-public class HdbManagerController {
-
-    private final ProjectController projectController; // Dependency
+public class HdbManagerController extends BaseController{
 
     public HdbManagerController(ProjectController projectController) {
-        this.projectController = projectController;
+        super(projectController);
     }
 
     // --- Project Management --- [cite: 25]

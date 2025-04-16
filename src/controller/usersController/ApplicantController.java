@@ -12,12 +12,10 @@ import java.util.Set;
 
 import controller.ProjectController;
 
-public class ApplicantController {
-
-    private final ProjectController projectController; // Dependency for filtering
+public class ApplicantController extends BaseController {
 
     public ApplicantController(ProjectController projectController) {
-        this.projectController = projectController;
+        super(projectController);
     }
 
     /**
