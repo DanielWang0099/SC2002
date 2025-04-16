@@ -18,6 +18,31 @@ import java.util.Optional;
 import java.util.stream.*;
 
 public class HdbManagerBoundary extends BaseBoundary {
+    private static final String[] menuOptions = {
+        "#Project Management",
+        "Create New BTO Project",
+        "Edit Existing BTO Project",
+        "Delete Existing BTO Project",
+        "Toggle Project Visibility",
+        "View All Projects",
+        "View My Managed Projects",
+        "#Registration Management",
+        "View Pending Officer Registrations",
+        "Process Officer Registration (Approve/Reject)",
+        "#Application Management",
+        "View Pending BTO Applications",
+        "Process BTO Application (Approve/Reject)",
+        "View Pending Withdrawal Requests",
+        "Process Withdrawal Request (Approve/Reject)",
+        "#Enquiry Management",
+        "View All Enquiries",
+        "View Enquiries for My Projects",
+        "Reply to Enquiry",
+        "#Reporting",
+        "Generate Booking Report",
+        "#General",
+        "Change Password",
+    };
 
     public HdbManagerBoundary(Scanner scanner, MainController mainController, User currentUser) {
         super(scanner, mainController, (HdbManager) currentUser);
@@ -28,94 +53,47 @@ public class HdbManagerBoundary extends BaseBoundary {
     }
 
     @Override
-    protected void displayMenu() {
-        System.out.println("\n==================================================");
-        System.out.println("             HDB Manager Main Menu");
-        System.out.println(" User: " + currentUser.getName() + " | NRIC: " + currentUser.getNric());
-        System.out.println("==================================================");
-
-        System.out.println("\n--- Project Management ---");
-        System.out.println(" 1. Create New BTO Project");
-        System.out.println(" 2. Edit Existing BTO Project");
-        System.out.println(" 3. Delete Existing BTO Project");
-        System.out.println(" 4. Toggle Project Visibility");
-        System.out.println(" 5. View All Projects");
-        System.out.println(" 6. View My Managed Projects");
-
-        System.out.println("\n--- Registration Management ---");
-        System.out.println(" 7. View Pending Officer Registrations");
-        System.out.println(" 8. Process Officer Registration (Approve/Reject)");
-
-        System.out.println("\n--- Application Management ---");
-        System.out.println(" 9. View Pending BTO Applications");
-        System.out.println("10. Process BTO Application (Approve/Reject)");
-        System.out.println("11. View Pending Withdrawal Requests");
-        System.out.println("12. Process Withdrawal Request (Approve/Reject)");
-
-        System.out.println("\n--- Enquiry Management ---");
-        System.out.println("13. View All Enquiries");
-        System.out.println("14. View Enquiries for My Projects");
-        System.out.println("15. Reply to Enquiry");
-
-        System.out.println("\n--- Reporting ---");
-        System.out.println("16. Generate Booking Report");
-
-        System.out.println("\n--- General ---");
-        System.out.println("17. Change Password");
-        System.out.println("18. Logout");
-
-        System.out.println("==================================================");
+    protected String[] getMenuOptions() {
+        return menuOptions;
     }
 
     @Override
     protected boolean processCommandOption(int choice) {
-        System.out.println("\n--------------------------------------------------");
-        switch (choice) {
+         boolean continueLoop = true;
+         switch (choice) {
+            case 0 -> { System.out.println("Logging out..."); return false; }
             // Project Management
-            case 1: System.out.println("Section: Create New BTO Project"); handleCreateProject(); break;
-            case 2: System.out.println("Section: Edit Existing BTO Project"); handleEditProject(); break;
-            case 3: System.out.println("Section: Delete Existing BTO Project"); handleDeleteProject(); break;
-            case 4: System.out.println("Section: Toggle Project Visibility"); handleToggleVisibility(); break;
-            case 5: System.out.println("Section: View All Projects"); handleViewAllProjects(); break;
-            case 6: System.out.println("Section: View My Managed Projects"); handleViewMyProjects(); break;
-
+            case 1 -> handleCreateProject();
+            case 2 -> handleEditProject();
+            case 3 -> handleDeleteProject();
+            case 4 -> handleToggleVisibility();
+            case 5 -> handleViewAllProjects();
+            case 6 -> handleViewMyProjects();
             // Registration Management
-            case 7: System.out.println("Section: View Pending Officer Registrations"); handleViewPendingOfficerRegs(); break;
-            case 8: System.out.println("Section: Process Officer Registration"); handleProcessOfficerReg(); break;
-
+            case 7 -> handleViewPendingOfficerRegs();
+            case 8 -> handleProcessOfficerReg();
             // Application Management
-            case 9: System.out.println("Section: View Pending BTO Applications"); handleViewPendingBtoApps(); break;
-            case 10: System.out.println("Section: Process BTO Application"); handleProcessBtoApp(); break;
-            case 11: System.out.println("Section: View Pending Withdrawal Requests"); handleViewPendingWithdrawals(); break;
-            case 12: System.out.println("Section: Process Withdrawal Request"); handleProcessWithdrawal(); break;
-
+            case 9 -> handleViewPendingBtoApps();
+            case 10 -> handleProcessBtoApp();
+            case 11 -> handleViewPendingWithdrawals();
+            case 12 -> handleProcessWithdrawal();
             // Enquiry Management
-            case 13: System.out.println("Section: View All Enquiries"); handleViewAllEnquiries(); break;
-            case 14: System.out.println("Section: View Enquiries for My Projects"); handleViewManagedEnquiries(); break;
-            case 15: System.out.println("Section: Reply to Enquiry"); handleReplyToEnquiry(); break;
-
+            case 13 -> handleViewAllEnquiries();
+            case 14 -> handleViewManagedEnquiries();
+            case 15 -> handleReplyToEnquiry();
             // Reporting
-            case 16: System.out.println("Section: Generate Booking Report"); handleGenerateReport(); break;
-
+            case 16 -> handleGenerateReport();
             // General
-            case 17:
-                System.out.println("Section: Change Password");
-                boolean changed = handleChangePassword();
-                if (changed) {
+            case 17 -> {
+                boolean changed = handleChangePassword(); // Use inherited helper method
+                if (changed){
                     System.out.println("Password change process completed. For security, please log in again.");
-                    System.out.println("--------------------------------------------------");
                     return false;
                 }
-                break;
-            case 18:
-                System.out.println("Logging out...");
-                System.out.println("--------------------------------------------------");
-                return false;
-            default:
-                System.out.println("Invalid choice.");
+            }
+            default -> System.out.println("Invalid choice. Please try again.");
         }
-        System.out.println("--------------------------------------------------");
-        return true;
+        return continueLoop;
     }
 
     // --- Action Handlers ---

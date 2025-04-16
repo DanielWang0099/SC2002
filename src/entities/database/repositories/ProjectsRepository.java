@@ -24,7 +24,7 @@ import entities.database.*;
 public class ProjectsRepository implements IRepository<Project, String> {
 
     private final Map<String, Project> projectMap = new ConcurrentHashMap<>();
-    private final String filename = "data/projects.csv"; // Define filename
+    private final String filename = "src/data/projects.csv"; // Define filename
     // Define a consistent date format for CSV read/write
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 

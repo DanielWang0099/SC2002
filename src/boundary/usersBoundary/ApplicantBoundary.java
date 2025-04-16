@@ -12,6 +12,20 @@ import java.util.List;
 import java.util.stream.*;
 
 public class ApplicantBoundary extends BaseBoundary {
+    private static final String[] menuOptions = {
+        "#BTO Application",
+        "View Available BTO Projects",
+        "Apply for Project",
+        "View My Application Status",
+        "Request Application Withdrawal",
+        "#Enquiries",
+        "Create Enquiry",
+        "View My Enquiries",
+        "Edit My Enquiry",
+        "Delete My Enquiry",
+        "#General",
+        "Change Password",
+    };
 
     public ApplicantBoundary(Scanner scanner, MainController mainController, User currentUser) {
         // Ensure the currentUser is indeed an Applicant
@@ -24,77 +38,35 @@ public class ApplicantBoundary extends BaseBoundary {
     }
 
     @Override
-    protected void displayMenu() {
-        System.out.println("\n==================================================");
-        System.out.println("           Applicant Main Menu");
-        System.out.println(" User: " + currentUser.getName() + " | NRIC: " + currentUser.getNric());
-        System.out.println("==================================================");
-        System.out.println("1. View Available BTO Projects");
-        System.out.println("2. Apply for Project");
-        System.out.println("3. View My Application Status");
-        System.out.println("4. Request Application Withdrawal");
-        System.out.println("5. Create Enquiry");
-        System.out.println("6. View My Enquiries");
-        System.out.println("7. Edit My Enquiry");
-        System.out.println("8. Delete My Enquiry");
-        System.out.println("9. Change Password");
-        System.out.println("10. Logout");
-        System.out.println("==================================================");
+    protected String[] getMenuOptions() {
+        return menuOptions;
     }
 
     @Override
     protected boolean processCommandOption(int choice) {
-        System.out.println("\n--------------------------------------------------");
         switch (choice) {
-            case 1:
-                System.out.println("Section: View Available BTO Projects");
-                handleViewAvailableProjects();
-                break;
-            case 2:
-                System.out.println("Section: Apply for Project");
-                handleApplyForProject();
-                break;
-            case 3:
-                System.out.println("Section: View My Application Status");
-                handleViewMyApplications();
-                break;
-            case 4:
-                System.out.println("Section: Request Application Withdrawal");
-                handleRequestWithdrawal();
-                break;
-            case 5:
-                System.out.println("Section: Create Enquiry");
-                handleCreateEnquiry();
-                break;
-            case 6:
-                System.out.println("Section: View My Enquiries");
-                handleViewMyEnquiries();
-                break;
-            case 7:
-                System.out.println("Section: Edit My Enquiry");
-                handleEditMyEnquiry();
-                break;
-            case 8:
-                System.out.println("Section: Delete My Enquiry");
-                handleDeleteMyEnquiry();
-                break;
-            case 9:
-                System.out.println("Section: Change Password");
-                boolean changed = handleChangePassword();
-                if (changed) {
+            case 0 -> { System.out.println("Logging out..."); return false; }
+            case 1 -> handleViewAvailableProjects();
+            case 2 -> handleApplyForProject();
+            case 3 -> handleViewMyApplications();
+            case 4 -> handleRequestWithdrawal();
+            case 5 -> handleCreateEnquiry();
+            case 6 -> handleViewMyEnquiries();
+            case 7 -> handleEditMyEnquiry();
+            case 8 -> handleDeleteMyEnquiry();
+            case 9 -> {
+                boolean changed = handleChangePassword(); // Use inherited helper method
+                if (changed){
                     System.out.println("Password change process completed. For security, please log in again.");
-                    System.out.println("--------------------------------------------------");
                     return false;
                 }
-                break;
-            case 10:
+            }
+            case 10 -> {
                 System.out.println("Logging out...");
-                System.out.println("--------------------------------------------------");
                 return false;
-            default:
-                System.out.println("Invalid choice. Please try again.");
+            }
+            default -> System.out.println("Invalid choice. Please try again.");
         }
-        System.out.println("--------------------------------------------------");
         return true;
     }
 
