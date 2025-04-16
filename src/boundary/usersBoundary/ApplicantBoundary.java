@@ -1,4 +1,4 @@
-package boundary;
+package boundary.usersBoundary;
 
 import java.util.Scanner;
 import controller.MainController;
