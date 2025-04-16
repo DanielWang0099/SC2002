@@ -25,7 +25,7 @@ import entities.database.repositories.*;
 
 public class RegistrationRepository implements IRepository<ProjectRegistration, String> {
     private final Map<String, ProjectRegistration> registrationMap = new ConcurrentHashMap<>();
-    private final String filename = "data/documents/registrations.csv";
+    private final String filename = "src/data/documents/registrations.csv";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); }
     // Package-private constructor

@@ -26,7 +26,7 @@ import entities.project.*;
  */
 public class ApplicationRepository implements IRepository<ProjectApplication, String> {
     private final Map<String, ProjectApplication> applicationMap = new ConcurrentHashMap<>();
-    private final String filename = "data/documents/applications.csv";
+    private final String filename = "src/data/documents/applications.csv";
 
 
     // Package-private constructor

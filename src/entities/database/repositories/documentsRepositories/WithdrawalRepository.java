@@ -24,7 +24,7 @@ import entities.database.repositories.*;
 
 public class WithdrawalRepository implements IRepository<Withdrawal, String> {
     private final Map<String, Withdrawal> withdrawalMap = new ConcurrentHashMap<>();
-    private final String filename = "data/documents/withdrawals.csv";
+    private final String filename = "src/data/documents/withdrawals.csv";
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
      static { DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC")); }
 
