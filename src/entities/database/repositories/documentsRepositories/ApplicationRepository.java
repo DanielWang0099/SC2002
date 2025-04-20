@@ -22,7 +22,7 @@ import java.time.ZoneId;
 import entities.project.*;
 
 /**
- * Repository specifically for managing ProjectApplication entities.
+ * This entity class is a repository for managing ProjectApplication entities.
  */
 public class ApplicationRepository implements IRepository<ProjectApplication, String> {
     private final Map<String, ProjectApplication> applicationMap = new ConcurrentHashMap<>();

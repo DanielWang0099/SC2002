@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import entities.database.repositories.usersRepositories.*;
 
+/**
+ * This entity class is a repository for managing User entities.
+ */
 public class UsersRepository {
 
     private final ApplicantRepository applicantRepository;

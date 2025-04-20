@@ -4,6 +4,9 @@ import controller.usersController.ApplicantController;
 import controller.usersController.HdbManagerController;
 import controller.usersController.HdbOfficerController;
 
+/**
+ * The main controller of the project.
+ */
 public class MainController {
     private final UserAuthenticationController authController;
     private final ApplicantController applicantController;

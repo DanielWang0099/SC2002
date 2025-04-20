@@ -11,6 +11,9 @@ import entities.documents.*;
 import java.util.List;
 import java.util.stream.*;
 
+/**
+ * This boundary class handles interaction flows for BTO Applicants.
+ */
 public class ApplicantBoundary extends BaseBoundary {
     private static final String[] menuOptions = {
         "#BTO Application",

@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.*;
 
+/**
+ * This boundary class handles interaction flows for HDB Managers.
+ */
 public class HdbManagerBoundary extends BaseBoundary {
     private static final String[] menuOptions = {
         "#Project Management",

@@ -1,5 +1,8 @@
 package entities.user;
 
+/**
+ * This entity class represents a HDB Officer.
+ */
 public class HdbOfficer extends Applicant {
     /**
      * Constructs a HDBOfficer object.

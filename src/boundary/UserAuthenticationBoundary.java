@@ -5,6 +5,9 @@ import controller.MainController;
 import entities.user.User;
 import java.util.Optional;
 
+/**
+ * This boundary class provides a UI for the authentication and login workflow.
+ */
 public class UserAuthenticationBoundary {
     private Scanner scanner;
     private MainController mainController;
@@ -38,7 +41,11 @@ public class UserAuthenticationBoundary {
         return userOpt;
     }
 
-    // Helper moved from BaseBoundary as this boundary might not need the full loop logic
+    /**
+     * Helper method to process and validate user string input.
+     * @param prompt Message to display
+     * @return Processed user input
+     */
     protected String getStringInput(String prompt) {
         String input = "";
         while (input.trim().isEmpty()) {

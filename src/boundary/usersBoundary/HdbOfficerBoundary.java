@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * This boundary class handles interaction flows for HDB Officers.
+ */
 public class HdbOfficerBoundary extends BaseBoundary {
     private static final String[] menuOptions = {
         "#Officer Functions",

@@ -22,6 +22,9 @@ import entities.project.Project;
 import entities.user.User;
 import utilities.CsvUtil;
 
+/**
+ * This entity class is a repository for managing Enquiry entities.
+ */
 public class EnquiryRepository implements IRepository<Enquiry, String> {
     private final Map<String, Enquiry> enquiryMap = new ConcurrentHashMap<>();
     private final String filename = "data/documents/enquiries.csv";

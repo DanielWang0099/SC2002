@@ -10,6 +10,10 @@ import entities.user.User;
 import entities.project.FlatType;
 import utilities.ui.MenuBuilder;
 
+/**
+ * Abstract base class for all user role boundaries, providing common UI
+ * components and input handling.
+ */
 public abstract class BaseBoundary {
     protected Scanner scanner;
     protected MainController mainController;

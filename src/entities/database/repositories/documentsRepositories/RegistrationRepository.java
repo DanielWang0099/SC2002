@@ -23,6 +23,9 @@ import utilities.CsvUtil;
 import entities.database.Database;
 import entities.database.repositories.*;
 
+/**
+ * This entity class is a repository for managing Registration entities.
+ */
 public class RegistrationRepository implements IRepository<ProjectRegistration, String> {
     private final Map<String, ProjectRegistration> registrationMap = new ConcurrentHashMap<>();
     private final String filename = "data/documents/registrations.csv";

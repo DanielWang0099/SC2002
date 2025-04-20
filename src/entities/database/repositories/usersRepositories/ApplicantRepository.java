@@ -11,9 +11,8 @@ import entities.database.repositories.IRepository;
 import utilities.*;
 import entities.project.*;
 
-
 /**
- * Repository specifically for managing Applicant entities.
+ * This entity class is a repository for managing Applicant entities.
  */
 public class ApplicantRepository implements IRepository<Applicant, String> {
 

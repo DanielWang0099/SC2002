@@ -2,6 +2,9 @@ package entities.user;
 
 import java.util.Objects;
 
+/**
+ * This entity class represents a user of our system.
+ */
 public class User {
     private String name;
     private String nric;
@@ -18,7 +21,7 @@ public class User {
      * @param age           the age of the user
      * @param maritalStatus the marital status of the user, SINGLE or MARRIED
      * @param password      the password of the user
-     * @param role
+     * @param role          the role of the user
      */
     public User(String name, String nric, Integer age, MaritalStatus maritalStatus, String password, Role role) {
         this.name = name;

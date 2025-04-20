@@ -9,7 +9,9 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import entities.user.*;
 
-
+/**
+ * This entity class represents a Build-To-Order (BTO) project.
+ */
 public class Project {
     private String name;
     private String neighbourhood;
