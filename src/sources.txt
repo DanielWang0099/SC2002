@@ -35,7 +35,6 @@ C:\Users\danie\.github\SC2002\src\entities\documents\approvableDocuments\Project
 C:\Users\danie\.github\SC2002\src\entities\documents\approvableDocuments\Withdrawal.java
 C:\Users\danie\.github\SC2002\src\entities\documents\repliableDocuments\Enquiry.java
 C:\Users\danie\.github\SC2002\src\entities\documents\repliableDocuments\IReplyableDocument.java
-C:\Users\danie\.github\SC2002\src\entities\project\ApplicationAccessController.java
 C:\Users\danie\.github\SC2002\src\entities\project\FlatType.java
 C:\Users\danie\.github\SC2002\src\entities\project\Project.java
 C:\Users\danie\.github\SC2002\src\entities\user\Applicant.java
