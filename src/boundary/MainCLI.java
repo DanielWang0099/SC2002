@@ -12,7 +12,6 @@ import controller.*;
 import entities.user.User;
 import entities.database.*;
 import utilities.io.IntScanner;
-import utilities.io.StringScanner;
 import utilities.ui.MenuBuilder;
 
 /**
@@ -136,7 +135,6 @@ public class MainCLI {
             scanner.close();
             System.out.println("Scanner closed.");
             IntScanner.close();
-            StringScanner.close();
         }
         System.exit(0); // Terminate the application
     }
