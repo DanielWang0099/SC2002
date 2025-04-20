@@ -90,7 +90,7 @@ public class Project {
 
     /**
      * Gets the selling price for a specific flat type.
-     * @param type The FlatType.
+     * @param o The Project object.
      * @return The price, or 0.0 if the type isn't offered or price not set.
      */
     @Override

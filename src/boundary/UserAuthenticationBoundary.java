@@ -19,7 +19,7 @@ public class UserAuthenticationBoundary {
 
      /**
      * Prompts for credentials and attempts login using the Auth Controller.
-     * @return Optional<User> containing the logged-in user if successful, empty otherwise.
+     * @return The logged-in user if successful, empty otherwise.
      */
     public Optional<User> promptLogin() {
         System.out.println("\n========================================");
