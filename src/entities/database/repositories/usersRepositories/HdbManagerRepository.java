@@ -13,7 +13,7 @@ import java.util.Date;
 public class HdbManagerRepository implements IRepository<HdbManager, String> {
 
     private final Map<String, HdbManager> managerMap = new ConcurrentHashMap<>();
-    private final String filename = "src/data/users/hdb_managers.csv"; // Define filename
+    private final String filename = "data/users/hdb_managers.csv"; // Define filename
 
     // Package-private constructor
    public HdbManagerRepository() {}
