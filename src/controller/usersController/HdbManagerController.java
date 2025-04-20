@@ -6,6 +6,7 @@ import entities.documents.approvableDocuments.*; // Needed for checking related 
 import entities.documents.repliableDocuments.*;
 import entities.documents.*;
 import entities.user.*;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
@@ -15,8 +16,9 @@ import java.util.stream.*;
 
 import controller.ProjectController;
 
-import java.util.Map;
-
+/**
+ * This controller class handles and manages HDB Manager-specific workflows.
+ */
 public class HdbManagerController extends BaseController{
 
     public HdbManagerController(ProjectController projectController) {

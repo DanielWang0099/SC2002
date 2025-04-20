@@ -12,6 +12,9 @@ import java.util.Set;
 
 import controller.ProjectController;
 
+/**
+ * This controller class handles and manages BTO Applicant-specific workflows.
+ */
 public class ApplicantController extends BaseController {
 
     public ApplicantController(ProjectController projectController) {
