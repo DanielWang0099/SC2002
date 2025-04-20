@@ -16,7 +16,9 @@ import java.util.stream.*;
 
 import controller.ProjectController;
 
-
+/**
+ * This controller class handles and manages HDB Officer-specific workflows.
+ */
 public class HdbOfficerController extends BaseController {
 
     private final ApplicantController applicantController; // To reuse applicant functions
