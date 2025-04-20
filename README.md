@@ -8,6 +8,9 @@ The Build-To-Order Management System (BTOMS) is a Java-based command line interf
 
 
 ## Project Structure
+- `docs/`
+  - `classDiagram/`: Stores the project UML class diagrams.
+  - `javadoc/`: Comprises of the generated Javadoc HTML.
 - `resources`: Stores the sample data files (e.g. user lists and BTO project data).
 - `src`: Contains all the Java source files.
 
@@ -25,32 +28,32 @@ The Build-To-Order Management System (BTOMS) is a Java-based command line interf
 
 
 ## Features
-- [ ] **System**
-  - [ ] Login.
-  - [ ] View profile.
-  - [ ] Change password.
-  - [ ] Filter for project listing (user's setting persists throughout program execution).
-- [ ] **Applicant**
-    - [ ] View available projects.
-    - [ ] Apply for a project.
-    - [ ] View their application status.
-    - [ ] Create booking for one flat (upon successful application).
-    - [ ] Submit request for withdrawal of application.
-    - [ ] Create, read, update, delete (CRUD) enquiries regarding BTO projects.
-- [ ] **HDB Officer**
-    - [ ] Possesses all of Applicant's capabilities.
-    - [ ] Register for a project.
-    - [ ] View their registration status.
-    - [ ] View details of project (upon successful registration).
-    - [ ] Respond to (and view) enquiries of the project.
-    - [ ] Generate receipt of applicants with their respective flat booking details.
-- [ ] **HDB Manager**
-    - [ ] CRUD BTO project listings.
-    - [ ] Approve/reject HDB Officer's registration.
-    - [ ] Approve/reject Applicant's application.
-    - [ ] Approve/reject Applicant's request to withdraw the application.
-    - [ ] Respond to (and view) all enquiries.
-    - [ ] Generate report on Applicants and their respective flat booking details.
+- [x] **System**
+  - [x] Login.
+  - [x] View profile.
+  - [x] Change password.
+  - [x] Filter for project listing (user's setting persists throughout program execution).
+- [x] **Applicant**
+    - [x] View available projects.
+    - [x] Apply for a project.
+    - [x] View their application status.
+    - [x] Create booking for one flat (upon successful application).
+    - [x] Submit request for withdrawal of application.
+    - [x] Create, read, update, delete (CRUD) enquiries regarding BTO projects.
+- [x] **HDB Officer**
+    - [x] Possesses all of Applicant's capabilities.
+    - [x] Register for a project.
+    - [x] View their registration status.
+    - [x] View details of project (upon successful registration).
+    - [x] Respond to (and view) enquiries of the project.
+    - [x] Generate receipt of applicants with their respective flat booking details.
+- [x] **HDB Manager**
+    - [x] CRUD BTO project listings.
+    - [x] Approve/reject HDB Officer's registration.
+    - [x] Approve/reject Applicant's application.
+    - [x] Approve/reject Applicant's request to withdraw the application.
+    - [x] Respond to (and view) all enquiries.
+    - [x] Generate report on Applicants and their respective flat booking details.
 
 
 ## Getting Started
