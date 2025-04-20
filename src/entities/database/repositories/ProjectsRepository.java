@@ -18,7 +18,7 @@ import utilities.*;
 import entities.database.*;
 
 /**
- * Repository for managing Project entities.
+ * This entity class is a repository for managing Project entities.
  * Uses Project Name (String) as the ID. Assumes Project Names are unique.
  */
 public class ProjectsRepository implements IRepository<Project, String> {

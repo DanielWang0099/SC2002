@@ -22,6 +22,9 @@ import utilities.CsvUtil;
 import entities.database.Database;
 import entities.database.repositories.*;
 
+/**
+ * This entity class is a repository for managing Withdrawal entities.
+ */
 public class WithdrawalRepository implements IRepository<Withdrawal, String> {
     private final Map<String, Withdrawal> withdrawalMap = new ConcurrentHashMap<>();
     private final String filename = "data/documents/withdrawals.csv";

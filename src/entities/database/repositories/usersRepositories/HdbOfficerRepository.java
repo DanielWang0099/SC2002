@@ -9,6 +9,9 @@ import entities.user.*;
 import entities.database.repositories.IRepository;
 import utilities.*;
 
+/**
+ * This entity class is a repository for managing HdbOfficer entities.
+ */
 public class HdbOfficerRepository implements IRepository<HdbOfficer, String> {
 
     private final Map<String, HdbOfficer> officerMap = new ConcurrentHashMap<>();

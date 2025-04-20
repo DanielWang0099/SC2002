@@ -4,6 +4,9 @@ import entities.database.Database;
 import entities.user.User;
 import java.util.Optional;
 
+/**
+ * Controller handling user authentication and password change.
+ */
 public class UserAuthenticationController {
 
     /**

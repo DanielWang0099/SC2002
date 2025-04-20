@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import entities.database.repositories.usersRepositories.*;
 
+/**
+ * This entity class is a repository for managing User entities.
+ */
 public class UsersRepository {
 
     private final ApplicantRepository applicantRepository;
@@ -40,7 +43,6 @@ public class UsersRepository {
      * Loads user data from a specified file (CSV assumed).
      * !! ASSUMED FORMAT: Name,NRIC,Password,Role,Age,MaritalStatus !!
      * (e.g., John Doe,S1234567A,password,APPLICANT,25,SINGLE)
-     * @param filename The path to the user data file.
      */
     public void saveAllUsers() {
         System.out.println("Saving all user types to CSV...");

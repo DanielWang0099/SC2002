@@ -1,5 +1,8 @@
 package entities.user;
 
+/**
+ * This entity class represents a HDB Manager.
+ */
 public class HdbManager extends User {
     /**
      * Constructs a HDBManager object.

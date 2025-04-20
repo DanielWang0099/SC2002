@@ -10,7 +10,7 @@ import entities.documents.repliableDocuments.*;
 import java.util.stream.Stream;
 
 /**
- * Repository for managing various Document entities.
+ * This entity class is a repository for managing Document entities.
  * Uses Document ID (String) as the key.
  */
 public class DocumentsRepository { // Not implementing IRepository<IBaseSubmittableDocument, String> directly

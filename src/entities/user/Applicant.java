@@ -1,5 +1,8 @@
 package entities.user;
 
+/**
+ * This entity class represents an Applicant.
+ */
 public class Applicant extends User {
     /**
      * Constructs an Applicant object.
@@ -8,7 +11,7 @@ public class Applicant extends User {
      * @param age           the age of the user
      * @param maritalStatus the marital status of the user, SINGLE or MARRIED
      * @param password      the password of the user
-     * @param role
+     * @param role          the role of the user
      */
     public Applicant(String name, String nric, int age, MaritalStatus maritalStatus, String password, Role role) {
         super(name, nric, age, maritalStatus, password, role);

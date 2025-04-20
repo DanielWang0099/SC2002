@@ -10,6 +10,9 @@ import entities.database.repositories.IRepository;
 import utilities.*;
 import java.util.Date;
 
+/**
+ * This entity class is a repository for managing HdbManager entities.
+ */
 public class HdbManagerRepository implements IRepository<HdbManager, String> {
 
     private final Map<String, HdbManager> managerMap = new ConcurrentHashMap<>();

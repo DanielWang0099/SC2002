@@ -1,0 +1,17 @@
+boundary
+boundary.usersBoundary
+controller
+controller.usersController
+entities
+entities.database
+entities.database.repositories
+entities.database.repositories.documentsRepositories
+entities.database.repositories.usersRepositories
+entities.documents
+entities.documents.approvableDocuments
+entities.documents.repliableDocuments
+entities.project
+entities.user
+utilities
+utilities.io
+utilities.ui
