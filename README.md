@@ -11,6 +11,7 @@ The Build-To-Order Management System (BTOMS) is a Java-based command line interf
 - `docs/`
   - `classDiagram/`: Stores the project UML class diagrams.
   - `javadoc/`: Comprises of the generated Javadoc HTML.
+  - `sequenceDiagram/`: Stores the project UML sequence diagrams.
 - `resources`: Stores the sample data files (e.g. user lists and BTO project data).
 - `src`: Contains all the Java source files.
 
