@@ -1,11 +1,24 @@
 # Build-To-Order Management System (BTOMS)
 
-NTU AY2024/25 Semester 2 | SC2002 Group Project
+<div align="center">
+<p>NTU AY2024/25 Semester 2 | SC2002 Group Project</p>
 
-[![Javadoc Badge](https://img.shields.io/badge/Javadoc!-f8981d?style=for-the-badge&logoSize=auto&label=Click%20to%20View%20our&labelColor=222222&link=https%3A%2F%2Fdanielwang0099.github.io%2FSC2002%2F)](https://danielwang0099.github.io/SC2002/)
-[![Class Diagrams Badge](https://img.shields.io/badge/Class%20Diagrams!-D5E8D4?style=for-the-badge&logoSize=auto&label=Click%20to%20View%20our&labelColor=222222&link=https%3A%2F%2Fdanielwang0099.github.io%2FSC2002%2F)](https://github.com/DanielWang0099/SC2002/blob/main/docs/classDiagram/main.png)
-[![Sequence Diagrams Badge](https://img.shields.io/badge/SEQUENCE%20Diagrams!-FFF6B6?style=for-the-badge&logoSize=auto&label=Click%20to%20View%20our&labelColor=222222&link=https%3A%2F%2Fdanielwang0099.github.io%2FSC2002%2F)](https://github.com/DanielWang0099/SC2002/blob/main/docs/sequenceDiagram/mainFunctionalities/Application%20Process.jpg)
+[![Javadoc Badge](https://img.shields.io/badge/Javadoc-F8981D?style=for-the-badge&logo=readthedocs&logoColor=FFFFFF&logoSize=auto&labelColor=222222)](https://danielwang0099.github.io/SC2002/)
+&nbsp;
+[![Class Diagrams Badge](https://img.shields.io/badge/Class%20Diagrams-C2F0C0?style=for-the-badge&logo=diagramsdotnet&logoColor=FFFFFF&logoSize=auto&labelColor=222222)](https://github.com/DanielWang0099/SC2002/blob/main/docs/classDiagram/main.png)
+&nbsp;
+[![Sequence Diagrams Badge](https://img.shields.io/badge/Sequence%20Diagrams-FFF6B6?style=for-the-badge&logo=miro&logoSize=auto&labelColor=222222)](https://github.com/DanielWang0099/SC2002/blob/main/docs/sequenceDiagram/mainFunctionalities/Application%20Process.jpg)
 
+👆 Click on the buttons above to view our work! 👆
+
+<p align="center">
+<a href="#project-overview">Project Overview</a> &nbsp;&bull;&nbsp;
+<a href="#project-structure">Project Structure</a> &nbsp;&bull;&nbsp;
+<a href="#team-members">Team Members</a> &nbsp;&bull;&nbsp;
+<a href="#features">Features</a> &nbsp;&bull;&nbsp;
+<a href="#getting-started">Getting Started</a>
+</p>
+</div>
 
 ## Project Overview
 The Build-To-Order Management System (BTOMS) is a Java-based command line interface (CLI) application that serves as a centralised hub for applicants and Housing Development Board (HDB) staff to view, apply and manage BTO projects. This project is developed as part of the SC2002, Object-Oriented Design & Programming, module assignment at Nanyang Technological University, Singapore. 
