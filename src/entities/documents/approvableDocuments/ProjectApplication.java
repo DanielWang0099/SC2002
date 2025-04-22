@@ -11,6 +11,9 @@ import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
 import entities.project.*;
 
+/**
+ * This class represents a BTO project application document submmited by an applicant.
+ */
 public class ProjectApplication implements IApprovableDocument {
 
     private final String documentID;
