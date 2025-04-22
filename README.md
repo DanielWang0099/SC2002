@@ -2,6 +2,10 @@
 
 NTU AY2024/25 Semester 2 | SC2002 Group Project
 
+[![Javadoc Badge](https://img.shields.io/badge/Javadoc!-f8981d?style=for-the-badge&logoSize=auto&label=Click%20to%20View%20our&labelColor=222222&link=https%3A%2F%2Fdanielwang0099.github.io%2FSC2002%2F)](https://danielwang0099.github.io/SC2002/)
+[![Class Diagrams Badge](https://img.shields.io/badge/Class%20Diagrams!-D5E8D4?style=for-the-badge&logoSize=auto&label=Click%20to%20View%20our&labelColor=222222&link=https%3A%2F%2Fdanielwang0099.github.io%2FSC2002%2F)](https://github.com/DanielWang0099/SC2002/blob/main/docs/classDiagram/main.png)
+[![Sequence Diagrams Badge](https://img.shields.io/badge/SEQUENCE%20Diagrams!-FFF6B6?style=for-the-badge&logoSize=auto&label=Click%20to%20View%20our&labelColor=222222&link=https%3A%2F%2Fdanielwang0099.github.io%2FSC2002%2F)](https://github.com/DanielWang0099/SC2002/blob/main/docs/sequenceDiagram/mainFunctionalities/Application%20Process.jpg)
+
 
 ## Project Overview
 The Build-To-Order Management System (BTOMS) is a Java-based command line interface (CLI) application that serves as a centralised hub for applicants and Housing Development Board (HDB) staff to view, apply and manage BTO projects. This project is developed as part of the SC2002, Object-Oriented Design & Programming, module assignment at Nanyang Technological University, Singapore. 
