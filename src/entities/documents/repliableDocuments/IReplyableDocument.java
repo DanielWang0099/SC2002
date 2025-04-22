@@ -3,6 +3,10 @@ package entities.documents.repliableDocuments;
 import entities.documents.IBaseSubmittableDocument;
 import entities.user.User;
 
+/**
+ * This interface defines common operations for documents that follow a
+ * common reply lifecycle.
+ */
 public interface IReplyableDocument extends IBaseSubmittableDocument {
 
     /**

@@ -7,6 +7,9 @@ import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
 import entities.project.*;
 
+/**
+ * This class represents a BTO project application withdrawal document submmited by an applicant.
+ */
 public class Withdrawal implements IApprovableDocument {
 
     private final String documentID;

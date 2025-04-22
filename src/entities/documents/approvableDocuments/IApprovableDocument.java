@@ -3,6 +3,10 @@ package entities.documents.approvableDocuments;
 import entities.user.User;
 import entities.documents.IBaseSubmittableDocument;
 
+/**
+ * This interface defines common operations for documents that follow a
+ * common approval/rejection lifecycle.
+ */
 public interface IApprovableDocument extends IBaseSubmittableDocument {
 
     /**

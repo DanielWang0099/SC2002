@@ -2,6 +2,10 @@ package entities.documents;
 
 import entities.user.User;
 
+/**
+ * This interface defines common operations for documents that follow a
+ * common submission lifecycle.
+ */
 public interface IBaseSubmittableDocument {
 
     /**
