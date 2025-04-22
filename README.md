@@ -1,4 +1,4 @@
-# Build-To-Order Management System (BTOMS)
+<h1 align="center">Build-To-Order Management System (BTOMS)</h1>
 
 <div align="center">
 <p>NTU AY2024/25 Semester 2 | SC2002 Group Project</p>
@@ -12,7 +12,7 @@
 👆 Click on the buttons above to view our work! 👆
 
 <p align="center">
-<a href="#project-overview">Project Overview</a> &nbsp;&bull;&nbsp;
+<a href="#introduction">Introduction</a> &nbsp;&bull;&nbsp;
 <a href="#project-structure">Project Structure</a> &nbsp;&bull;&nbsp;
 <a href="#team-members">Team Members</a> &nbsp;&bull;&nbsp;
 <a href="#features">Features</a> &nbsp;&bull;&nbsp;
@@ -20,7 +20,7 @@
 </p>
 </div>
 
-## Project Overview
+## Introduction
 The Build-To-Order Management System (BTOMS) is a Java-based command line interface (CLI) application that serves as a centralised hub for applicants and Housing Development Board (HDB) staff to view, apply and manage BTO projects. This project is developed as part of the SC2002, Object-Oriented Design & Programming, module assignment at Nanyang Technological University, Singapore. 
 
 
