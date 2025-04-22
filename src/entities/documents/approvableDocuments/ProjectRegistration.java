@@ -7,6 +7,9 @@ import entities.documents.DocumentStatus;
 import entities.documents.DocumentType;
 import entities.project.*;
 
+/**
+ * This class represents a registration document submmited by a HDB officer for a BTO project.
+ */
 public class ProjectRegistration implements IApprovableDocument {
 
     private final String documentID;

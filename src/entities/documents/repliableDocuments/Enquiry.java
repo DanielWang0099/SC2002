@@ -7,6 +7,10 @@ import java.util.UUID;
 import entities.documents.DocumentType;
 import entities.project.*;
 
+/**
+ * This class represents an enquiry document submmited by a user
+ * regarding a specific BTO project.
+ */
 public class Enquiry implements IReplyableDocument {
 
     private final String documentID;
